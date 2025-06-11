@@ -1,0 +1,27 @@
+<!-- login.html -->
+{% extends 'base.html' %}
+{% block title %}Вход{% endblock %}
+{% block content %}
+    <h1>Вход</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            {% if category == 'login_error' %}
+                <div style="background: rgb(250, 204, 204); border: 1px solid rgb(235, 41, 27); padding: 10px; margin-bottom: 10px;">
+                <p>{{ message }}</p>
+                </div>
+            {% endif %}
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="post">
+        <label>Email: <input type="email" name="email" required></label><br>
+        <label>Пароль: <input type="password" name="password" required></label><br>
+        <button type="submit">Войти</button>
+    </form>
+    <p><a href="/register">Нет аккаунта? Зарегистрироваться</a></p>
+    <br>
+    <p><a href="/">← На главную</a></p>
+    <br>
+{% endblock %}

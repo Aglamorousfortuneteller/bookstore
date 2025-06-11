@@ -1,0 +1,21 @@
+<!-- register.html -->
+{% extends 'base.html' %}
+{% block title %}Регистрация{% endblock %}
+{% block content %}
+    <h1>Регистрация</h1>
+
+    <form method="post">
+        <label>Имя:<br> <input type="text" name="first_name" required></label><br><br>
+        <label>Фамилия:<br> <input type="text" name="last_name" required></label><br><br>
+        <label>Email:<br> <input type="email" name="email" required></label><br><br>
+        <label>Номер телефона:<br> <input type="text" name="phone" required></label><br><br>
+        <label>Пароль:<br> <input type="password" name="password" required></label><br><br>
+        <label>Повторите пароль:<br> <input type="password" name="confirm_password" required></label><br><br>
+
+        <button type="submit">Зарегистрироваться</button>
+    </form>
+
+    <br>
+    <p><a href="{{ url_for('index') }}">← На главную</a></p>
+    <br>
+{% endblock %}

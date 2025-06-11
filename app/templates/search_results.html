@@ -1,0 +1,32 @@
+<!-- search_result.html -->
+{% extends 'base.html' %}
+{% block title %}Результаты поиска{% endblock %}
+{% block content %}
+
+<h2 style="margin-bottom: 20px;">Результаты поиска по запросу: “{{ query }}”</h2>
+
+{% if books %}
+    <div class="book-grid">
+        {% for book in books %}
+            <a href="{{ url_for('book_detail', book_id=book.id, prev=request.full_path) }}"
+               class="book-card">
+                <div>
+                    <img src="https://media.istockphoto.com/id/162833278/nl/foto/blank-book.jpg?s=612x612&w=0&k=20&c=C-kb218UqFZ_ZdWg8ILDDcXDwpmYzwghnew_7VWZwm4="
+                         alt="Обложка" class="book-image">
+                    <div class="book-info">
+                        <strong>{{ book.title }}</strong><br>
+                        <span>{{ book.author }}</span>
+                    </div>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>Ничего не найдено.</p>
+{% endif %}
+
+<br>
+<a href="{{ url_for('index') }}" style="display: inline-block; margin-top: 20px; text-decoration: none;">← Назад на главную</a>
+<br>
+<br>
+{% endblock %}

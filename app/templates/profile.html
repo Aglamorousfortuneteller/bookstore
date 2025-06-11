@@ -1,0 +1,38 @@
+<!-- profile.html -->
+{% extends 'base.html' %}
+{% block title %}Профиль{% endblock %}
+{% block content %}
+<h1>Профиль пользователя</h1>
+<div style="margin-bottom: 20px;">
+    <p><strong>Имя:</strong> {{ current_user.first_name }} {{ current_user.last_name }}</p>
+
+    <p><strong>Email:</strong> {{ current_user.email }}</p>
+    <p><strong>Телефон:</strong> {{ current_user.phone }}</p>
+</div>
+
+<p><a href="{{ url_for('orders') }}">📦 Посмотреть мои заказы</a></p>
+
+
+<h2>Смена пароля</h2>
+<form method="post" action="{{ url_for('change_password') }}">
+    <label>Текущий пароль: 
+        <input type="password" name="current_password" required>
+    </label><br>
+    <label>Новый пароль: 
+        <input type="password" name="new_password" required>
+    </label><br>
+    
+    <button type="submit">Сменить пароль</button>
+</form>
+<hr>
+<h2 style="color: red;">Удаление аккаунта</h2>
+<form method="post" action="{{ url_for('delete_account') }}" onsubmit="return confirm('Вы уверены, что хотите удалить аккаунт?')">
+    <button type="submit" style="color: white; background-color: red;">Удалить аккаунт</button>
+</form>
+
+<a href="{{ url_for('index') }}" style="display: inline-block; margin-top: 20px; text-decoration: none;">← На главную</a>
+    <br>
+    <br>
+    <br>
+    <br> 
+{% endblock %}

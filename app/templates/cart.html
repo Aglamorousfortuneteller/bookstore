@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Корзина{% endblock %}
+{% block content %}
+<h1>🛒 Ваша корзина</h1>
+
+{% if cart_items %}
+<form method="post" action="{{ url_for('checkout') }}">
+    <label>
+        <input type="checkbox" id="select-all" onclick="
+            var checkboxes = document.querySelectorAll('.item-checkbox');
+            for (var i = 0; i < checkboxes.length; i++) checkboxes[i].checked = this.checked;
+        "> Выбрать все
+    </label>
+
+    <ul style="list-style: none; padding-left: 0;">
+        {% for item in cart_items %}
+        <li style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+            <input type="checkbox" class="item-checkbox" name="selected_items" value="{{ item.id }}">
+            <img src="https://media.istockphoto.com/id/162833278/nl/foto/blank-book.jpg?s=612x612&w=0&k=20&c=C-kb218UqFZ_ZdWg8ILDDcXDwpmYzwghnew_7VWZwm4=" style="width: 60px; height: auto; border: 1px solid #ccc;">
+            <div style="flex: 1;">
+                <strong>{{ item.book.title }}</strong><br>
+                Автор: {{ item.book.author }}<br>
+                Год: {{ item.book.year }}<br>
+                Цена: {{ item.book.price }} ₽
+            </div>
+            <!-- отдельная форма вне основной формы -->
+            <form method="post" action="{{ url_for('update_cart_item', item_id=item.id) }}">
+                <input type="number" name="quantity" value="{{ item.quantity }}" min="1" style="width: 60px;" onchange="this.form.submit();">
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <p><strong>Итого:</strong> {{ "%.2f"|format(total) }} ₽</p>
+
+    <!-- гиперссылка вместо кнопки -->
+    <button type="submit" style="display: inline-block; background: none; border: none; color: blue; text-decoration: underline; cursor: pointer; padding: 0;">Перейти к оформлению</button>
+</form>
+{% else %}
+<p>Ваша корзина пуста.</p>
+{% endif %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, message in messages %}
+    <div class="flash {{ category }}">{{ message }}</div>
+  {% endfor %}
+{% endwith %}
+
+<br>
+<a href="{{ url_for('index') }}">← На главную</a>
+{% endblock %}

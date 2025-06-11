@@ -1,0 +1,18 @@
+<!-- confirm.html -->>
+{% extends 'base.html' %}
+{% block title %}Подтверждение регистрации{% endblock %}
+{% block content %}
+    <h1>Подтверждение регистрации</h1>
+
+    <form method="post">
+        <label>Введите код из СМС:<br>
+            <input type="text" name="code" required>
+        </label><br><br>
+
+        <button type="submit">Подтвердить</button>
+    </form>
+
+    <br>
+    <p><a href="{{ url_for('register') }}">← Назад к регистрации</a></p>
+    <br>
+{% endblock %}
