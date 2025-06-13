@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Детали заказа{% endblock %}
+{% block content %}
+<h1>Детали заказа</h1>
+
+<p><strong>Номер заказа:</strong> {{ order.id }}</p>
+<p><strong>Статус:</strong> {{ order.status }}</p>
+<p><strong>ФИО:</strong> {{ order.name }}</p>
+<p><strong>Телефон:</strong> {{ order.phone }}</p>
+<p><strong>Способ доставки:</strong> {{ order.delivery_method|delivery_label }}</p>
+{% if order.delivery_method in ['courier', 'postman'] %}
+<p><strong>Адрес доставки:</strong> {{ order.address }}</p>
+{% elif order.delivery_method == 'store' %}
+<p><strong>Пункт самовывоза:</strong> {{ order.pickup_location }}</p>
+{% endif %}
+<p><strong>Дата оформления:</strong> {{ order.date.strftime('%d.%m.%Y') }}</p>
+<p><strong>Оплата:</strong> при получении</p>
+
+<h3>Состав заказа</h3>
+<ul>
+    {% for item in order.items %}
+        <li>{{ item.book_title }} — {{ item.quantity }} шт. × {{ item.price }} ₽</li>
+    {% endfor %}
+</ul>
+
+<p><strong>Итого:</strong> {{ "%.2f"|format(order.total_price) }} ₽</p>
+
+{% if order.status == 'Ожидается' %}
+<button onclick="showCancelConfirmation()">Отменить заказ</button>
+{% endif %}
+
+<!-- Подтверждение отмены -->
+<div id="cancel-popup" style="display: none; position: fixed; top: 50%; left: 50%;
+     transform: translate(-50%, -50%); background: white; padding: 20px; border: 1px solid #333; z-index: 1000;">
+    <p>Вы уверены, что хотите отменить заказ?</p>
+    <form method="post" action="{{ url_for('cancel_order', order_id=order.id) }}">
+        <button type="submit">Да</button>
+        <button type="button" onclick="closeCancelPopup()">Нет</button>
+    </form>
+</div>
+
+<script>
+function showCancelConfirmation() {
+    document.getElementById('cancel-popup').style.display = 'block';
+}
+function closeCancelPopup() {
+    document.getElementById('cancel-popup').style.display = 'none';
+}
+</script>
+
+<a href="{{ url_for('orders') }}">← Назад к заказам</a>
+{% endblock %}

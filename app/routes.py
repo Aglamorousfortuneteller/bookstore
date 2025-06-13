@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, flash, current_app, session
+from flask import render_template, request, redirect, url_for, flash, current_app, session, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -231,6 +231,10 @@ def delete_account():
 def view_cart():
     cart_items = CartItem.query.filter_by(user_id=current_user.id).all()
     total = sum(item.book.price * item.quantity for item in cart_items)
+
+    if request.args.get('error') == '1':
+        flash('Выберите хотя бы одну книгу для удаления', 'error')
+
     return render_template('cart.html', cart_items=cart_items, total=total)
 
 
@@ -255,6 +259,27 @@ def update_cart_item(item_id):
 
     return redirect(url_for('view_cart'))
 
+@app.route('/cart/total')
+@login_required
+def cart_total():
+    cart_items = CartItem.query.filter_by(user_id=current_user.id).all()
+    total = round(sum(item.book.price * item.quantity for item in cart_items), 2)
+    return jsonify({'total': total})
+
+
+@app.route('/cart/delete/<int:item_id>', methods=['POST'])
+@login_required
+def delete_from_cart(item_id):
+    item = CartItem.query.get(item_id)
+    if item and item.user_id == current_user.id:
+        db.session.delete(item)
+        db.session.commit()
+        flash("Книга удалена из корзины", "error")  # Используется стиль с красной рамкой
+    return '', 204  # Возвращаем пусто, т.к. fetch() сам обновит страницу
+
+
+
+
 
 @app.route('/remove_selected', methods=['POST'])
 @login_required
@@ -277,29 +302,44 @@ def remove_selected():
 @login_required
 def checkout():
     if request.method == 'POST':
-        selected_ids = request.form.getlist('selected_items')
+        for key, value in request.form.items():
+            if key.startswith('quantities_'):
+                try:
+                    item_id = int(key.split('_')[1])
+                    new_qty = int(value)
+                    cart_item = CartItem.query.get(item_id)
+                    if cart_item and cart_item.user_id == current_user.id:
+                        cart_item.quantity = new_qty
+                except ValueError:
+                    continue
+        db.session.commit()
+
+        selected_ids_raw = request.form.get('selected_items')
+        selected_ids = selected_ids_raw.split(',') if selected_ids_raw else []
+
         if not selected_ids:
-            flash("Выберите хотя бы один товар для оформления заказа", "error")
+            if request.form.get('flash_error'):
+                flash("Выберите хотя бы один товар для оформления заказа", "error")
             return redirect(url_for('view_cart'))
 
-        session['selected_ids'] = selected_ids  # сохраняем в сессию
+
+        session['selected_ids'] = selected_ids
+        return redirect(url_for('checkout'))
+
+    # GET-запрос — рендерим страницу оформления
+    selected_ids = session.get('selected_ids')
+    if selected_ids:
         cart_items = CartItem.query.filter(
             CartItem.id.in_(selected_ids),
             CartItem.user_id == current_user.id
         ).all()
     else:
-        # GET-запрос: отображаем все товары (или выбранные из сессии, если есть)
-        selected_ids = session.get('selected_ids')
-        if selected_ids:
-            cart_items = CartItem.query.filter(
-                CartItem.id.in_(selected_ids),
-                CartItem.user_id == current_user.id
-            ).all()
-        else:
-            cart_items = CartItem.query.filter_by(user_id=current_user.id).all()
+        cart_items = CartItem.query.filter_by(user_id=current_user.id).all()
 
     total = round(sum(item.book.price * item.quantity for item in cart_items), 2)
     return render_template('checkout.html', cart_items=cart_items, total=total)
+
+
 
 
 

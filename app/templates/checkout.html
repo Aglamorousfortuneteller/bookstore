@@ -9,80 +9,65 @@
     <li>{{ item.book.title }} — {{ item.quantity }} шт. × {{ item.book.price }} ₽</li>
     {% endfor %}
 </ul>
+
 <p><strong>Итого:</strong> {{ "%.2f"|format(total) }} ₽</p>
 
+<form method="post" action="{{ url_for('confirm_order') }}">
+    <label>Фамилия Имя:
+        <input type="text" name="name" value="{{ current_user.first_name or '' }} {{ current_user.last_name or '' }}" required>
+    </label><br><br>
 
-<form method="post" action="{{ url_for('checkout') }}">
-    <p><strong>Кто будет забирать/получать заказ?</strong></p>
-    <label><input type="radio" name="recipient_type" value="self" checked> Я ({{ current_user.first_name or '' }} {{ current_user.last_name or '' }}) </label><br>
-    <label><input type="radio" name="recipient_type" value="other"> Другой получатель</label><br><br>
-
-    <div>
-        <label>Фамилия Имя получателя:
-            <input type="text" name="name"
-                   value="{{ current_user.first_name or '' }} {{ current_user.last_name or '' }}" required>
-        </label>
-    </div><br>
-
-    <label>Телефон получателя:
-        <input type="tel" name="phone" value="{{ request.form.phone or current_user.phone }}" required>
+    <label>Телефон:
+        <input type="tel" name="phone" value="{{ current_user.phone or '' }}" required>
     </label><br><br>
 
     <label>Способ доставки:
-        <select name="delivery_method" required>
-            <option value="courier" {% if request.form.delivery_method == 'courier' %}selected{% endif %}>Доставка курьером</option>
-            <option value="postman" {% if request.form.delivery_method == 'postman' %}selected{% endif %}>Почта</option>
-            <option value="store" {% if request.form.delivery_method == 'store' %}selected{% endif %}>Самовывоз</option>
+        <select name="delivery_method" id="delivery-method" required onchange="toggleDeliveryFields()">
+            <option value="">-- Выберите --</option>
+            <option value="courier">Курьер</option>
+            <option value="postman">Почта</option>
+            <option value="store">Самовывоз</option>
         </select>
     </label><br><br>
 
-    {% if request.method == 'POST' %}
-        {% if request.form.delivery_method in ['courier', 'postman'] %}
-            <label>Адрес доставки: <input type="text" name="address" required></label><br><br>
-        {% elif request.form.delivery_method == 'store' %}
+    <div id="address-block" style="display:none;">
+        <label>Адрес доставки:
+            <input type="text" name="address">
+        </label><br><br>
+    </div>
+
+        <div id="pickup-block" style="display:none;">
             <label>Пункт самовывоза:
-                <select name="pickup_location" required>
+                <select name="pickup_location">
                     <option value="store1">ул. Ленина, 1</option>
                     <option value="store2">ул. Победы, 12</option>
                     <option value="store3">пр-т Независимости, 45</option>
+                    <option value="moscow_tverskaya_8">г. Москва, ул. Тверская, д. 8</option>  <!-- 📍 добавлено -->
                 </select>
             </label><br><br>
-        {% endif %}
-    {% endif %}
+        </div>
 
-    <input type="hidden" name="confirm" value="yes">
-    <button type="submit" formaction="{{ url_for('confirm_order') }}">Перейти к подтверждению</button>
+    <p><strong>Оплата:</strong> при получении</p>
+    <p><strong>Сумма заказа:</strong> {{ "%.2f"|format(total) }} ₽</p>
+    <p><strong>Дата доставки:</strong> {{ delivery_date }}</p>
+
+    <input type="hidden" name="total" value="{{ total }}">
+    <input type="hidden" name="delivery_date" value="{{ delivery_date }}">
+
+    <button type="submit">Подтвердить и оформить заказ</button>
 </form>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const selfRadio = document.querySelector('input[name="recipient_type"][value="self"]');
-    const otherRadio = document.querySelector('input[name="recipient_type"][value="other"]');
-    const nameField = document.querySelector('input[name="name"]');
-    const phoneField = document.querySelector('input[name="phone"]');
-
-    const defaultName = "{{ (current_user.first_name or '') ~ ' ' ~ (current_user.last_name or '') }}";
-    const defaultPhone = "{{ current_user.phone or '' }}";
-
-    function updateFields() {
-        if (selfRadio.checked) {
-            nameField.value = defaultName;
-            phoneField.value = defaultPhone;
-        } else if (otherRadio.checked) {
-            nameField.value = '';
-            phoneField.value = '';
-        }
-    }
-
-    selfRadio.addEventListener('change', updateFields);
-    otherRadio.addEventListener('change', updateFields);
-});
+function toggleDeliveryFields() {
+    const method = document.getElementById("delivery-method").value;
+    document.getElementById("address-block").style.display = (method === "courier" || method === "postman") ? "block" : "none";
+    document.getElementById("pickup-block").style.display = (method === "store") ? "block" : "none";
+}
 </script>
-
 
 {% else %}
 <p>Нет товаров для оформления.</p>
 {% endif %}
 
-<br><a href="{{ url_for('view_cart') }}">← Назад в корзину</a>
+<a href="{{ url_for('view_cart') }}">← Назад в корзину</a>
 {% endblock %}
