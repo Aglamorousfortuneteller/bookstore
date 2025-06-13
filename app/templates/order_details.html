@@ -11,7 +11,8 @@
 {% if order.delivery_method in ['courier', 'postman'] %}
 <p><strong>Адрес доставки:</strong> {{ order.address }}</p>
 {% elif order.delivery_method == 'store' %}
-<p><strong>Пункт самовывоза:</strong> {{ order.pickup_location }}</p>
+<p><strong>Пункт самовывоза:</strong> {{ order.pickup_location|pickup_label }}</p>
+
 {% endif %}
 <p><strong>Дата оформления:</strong> {{ order.date.strftime('%d.%m.%Y') }}</p>
 <p><strong>Оплата:</strong> при получении</p>

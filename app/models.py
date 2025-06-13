@@ -11,33 +11,37 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     phone = db.Column(db.String(20))
     password = db.Column(db.String(100), nullable=False)
-    
     cart_items = db.relationship('CartItem', back_populates='user', cascade='all, delete-orphan', passive_deletes=True)
-
     reviews = db.relationship('Review', backref='user', cascade='all, delete-orphan', passive_deletes=True)
-
     def set_password(self, raw_password):
         self.password = generate_password_hash(raw_password)
-
     def check_password(self, raw_password):
         return check_password_hash(self.password, raw_password)
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    date = db.Column(db.DateTime, default=datetime.utcnow)
-    total_price = db.Column(db.Float, nullable=False)
-    status = db.Column(db.String(50), default="Ожидается")
-
-    items = db.relationship('OrderItem', backref='order', lazy=True)
-
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    date = db.Column(db.DateTime)
+    total_price = db.Column(db.Float)
+    status = db.Column(db.String(50))
+    name = db.Column(db.String(100))
+    phone = db.Column(db.String(20)) 
+    delivery_method = db.Column(db.String(20))
+    address = db.Column(db.String(255)) 
+    pickup_location = db.Column(db.String(255)) 
+    user = db.relationship('User', backref='orders')
+    items = db.relationship('OrderItem', backref='order', lazy=True)  # ✅ Оставляем только здесь
 
 class OrderItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=False)
-    book_title = db.Column(db.String(256), nullable=False)
+    book_id = db.Column(db.Integer, db.ForeignKey('book.id'), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
+    price = db.Column(db.Float, nullable=False)
+    book = db.relationship('Book')
     price_per_item = db.Column(db.Float, nullable=False)
+    book_title = db.Column(db.String(256), nullable=False)
+
 
 
 class Book(db.Model):
@@ -52,19 +56,13 @@ class Book(db.Model):
     description = db.Column(db.Text)
     rating = db.Column(db.Float)
 
-    
-
-
 class CartItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     book_id = db.Column(db.Integer, db.ForeignKey('book.id'), nullable=False)
     quantity = db.Column(db.Integer, default=1)
-
     user = db.relationship('User', back_populates='cart_items')
-
     book = db.relationship('Book')
-
 
 class Review(db.Model):
     id = db.Column(db.Integer, primary_key=True)
