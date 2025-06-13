@@ -5,47 +5,76 @@
 
 {% if cart_items %}
 <form method="post" action="{{ url_for('checkout') }}">
-    <label>
-        <input type="checkbox" id="select-all" onclick="
-            var checkboxes = document.querySelectorAll('.item-checkbox');
-            for (var i = 0; i < checkboxes.length; i++) checkboxes[i].checked = this.checked;
-        "> Выбрать все
-    </label>
+<div style="display: flex; gap: 30px; align-items: flex-start;">
 
-    <ul style="list-style: none; padding-left: 0;">
-        {% for item in cart_items %}
-        <li style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
-            <input type="checkbox" class="item-checkbox" name="selected_items" value="{{ item.id }}">
-            <img src="https://media.istockphoto.com/id/162833278/nl/foto/blank-book.jpg?s=612x612&w=0&k=20&c=C-kb218UqFZ_ZdWg8ILDDcXDwpmYzwghnew_7VWZwm4=" style="width: 60px; height: auto; border: 1px solid #ccc;">
-            <div style="flex: 1;">
-                <strong>{{ item.book.title }}</strong><br>
-                Автор: {{ item.book.author }}<br>
-                Год: {{ item.book.year }}<br>
-                Цена: {{ item.book.price }} ₽
-            </div>
-            <!-- отдельная форма вне основной формы -->
-            <form method="post" action="{{ url_for('update_cart_item', item_id=item.id) }}">
-                <input type="number" name="quantity" value="{{ item.quantity }}" min="1" style="width: 60px;" onchange="this.form.submit();">
-            </form>
-        </li>
-        {% endfor %}
-    </ul>
+    <!-- Левая колонка: список товаров -->
+    <div style="flex: 2;">
+        <label>
+            <input type="checkbox" id="select-all" onclick="
+                const checkboxes = document.querySelectorAll('.item-checkbox');
+                checkboxes.forEach(cb => cb.checked = this.checked);
+                updateSelectedCount();
+            "> Выбрать все
+        </label>
+        <span id="selected-count" style="margin-left: 10px;">0 выбрано</span>
 
-    <p><strong>Итого:</strong> {{ "%.2f"|format(total) }} ₽</p>
+        <ul style="list-style: none; padding-left: 0;">
+            {% for item in cart_items %}
+            <li style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                <input type="checkbox" class="item-checkbox" name="selected_items" value="{{ item.id }}">
+                <img src="https://media.istockphoto.com/id/162833278/nl/foto/blank-book.jpg?s=612x612&w=0&k=20&c=C-kb218UqFZ_ZdWg8ILDDcXDwpmYzwghnew_7VWZwm4=" style="width: 60px; border: 1px solid #ccc;">
+                <div style="flex: 1;">
+                    <strong>{{ item.book.title }}</strong><br>
+                    Автор: {{ item.book.author }}<br>
+                    Год: {{ item.book.year }}<br>
+                    Цена: {{ item.book.price }} ₽
+                </div>
+                <div>
+                    <label>Количество:
+                        <input type="number" name="quantities_{{ item.id }}" value="{{ item.quantity }}" min="1" style="width: 50px;">
+                    </label>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
 
-    <!-- гиперссылка вместо кнопки -->
-    <button type="submit" style="display: inline-block; background: none; border: none; color: blue; text-decoration: underline; cursor: pointer; padding: 0;">Перейти к оформлению</button>
+    <!-- Правая колонка -->
+    <div style="flex: 1; border-left: 1px solid #ccc; padding-left: 20px;">
+        <p><strong>Итого:</strong> {{ "%.2f"|format(total) }} ₽</p>
+
+        <button type="submit"
+                style="background: none; border: none; color: blue; text-decoration: underline; cursor: pointer; padding: 0; margin-bottom: 10px;">
+            Перейти к оформлению
+        </button>
+
+        <br><br>
+        <button type="submit" formaction="{{ url_for('remove_selected') }}"
+                style="background: none; border: 1px solid red; color: red; padding: 5px 10px; cursor: pointer;">
+            Удалить выбранные
+        </button>
+    </div>
+</div>
 </form>
 {% else %}
 <p>Ваша корзина пуста.</p>
 {% endif %}
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% for category, message in messages %}
-    <div class="flash {{ category }}">{{ message }}</div>
-  {% endfor %}
-{% endwith %}
+
 
 <br>
 <a href="{{ url_for('index') }}">← На главную</a>
+
+<script>
+function updateSelectedCount() {
+    const selected = document.querySelectorAll('.item-checkbox:checked').length;
+    document.getElementById('selected-count').textContent = `${selected} выбрано`;
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const checkboxes = document.querySelectorAll('.item-checkbox');
+    checkboxes.forEach(cb => cb.addEventListener('change', updateSelectedCount));
+    updateSelectedCount();
+});
+</script>
 {% endblock %}

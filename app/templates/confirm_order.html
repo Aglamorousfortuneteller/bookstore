@@ -5,7 +5,7 @@
 
 <p>ФИО: {{ name }}</p>
 <p>Телефон: {{ phone }}</p>
-<p>Способ доставки: {{ delivery_method }}</p>
+<p>Способ доставки: {{ delivery_method|delivery_label }}</p>
 <p>Сумма заказа: {{ "%.2f"|format(total) }} ₽</p>
 <p>Дата доставки: {{ delivery_date }}</p>
 <p><strong>Оплата при получении</strong></p>
