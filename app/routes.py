@@ -256,91 +256,63 @@ def update_cart_item(item_id):
 @app.route('/checkout', methods=['GET', 'POST'])
 @login_required
 def checkout():
+    cart_items = CartItem.query.filter_by(user_id=current_user.id).all()
+    total = sum(item.book.price * item.quantity for item in cart_items)
+
     if request.method == 'POST':
-        selected_ids = request.form.getlist('selected_items')
-        if not selected_ids:
-            flash("Выберите хотя бы один товар для оформления заказа", "error")
-            return redirect(url_for('view_cart'))
+        return render_template('checkout.html', items=cart_items, total=total)
 
-        session['selected_ids'] = selected_ids  # сохраняем в сессию
-        cart_items = CartItem.query.filter(
-            CartItem.id.in_(selected_ids),
-            CartItem.user_id == current_user.id
-        ).all()
-    else:
-        # GET-запрос: отображаем все товары (или выбранные из сессии, если есть)
-        selected_ids = session.get('selected_ids')
-        if selected_ids:
-            cart_items = CartItem.query.filter(
-                CartItem.id.in_(selected_ids),
-                CartItem.user_id == current_user.id
-            ).all()
-        else:
-            cart_items = CartItem.query.filter_by(user_id=current_user.id).all()
-
-    total = round(sum(item.book.price * item.quantity for item in cart_items), 2)
-    return render_template('checkout.html', cart_items=cart_items, total=total)
-
+    return render_template('checkout.html', items=cart_items, total=total)
 
 
 @app.route('/confirm_order', methods=['POST'])
 @login_required
 def confirm_order():
-    selected_ids = session.get('selected_ids', [])
-    cart_items = CartItem.query.filter(
-        CartItem.id.in_(selected_ids),
-        CartItem.user_id == current_user.id
-    ).all()
+    name = request.form['name']
+    phone = request.form['phone']
+    delivery_method = request.form['delivery_method']
+    address = request.form.get('address', '')
+    pickup_location = request.form.get('pickup_location', '')
+    delivery_date = datetime.utcnow().date().strftime("%d.%m.%Y")
 
-    if not cart_items:
-        flash("Не удалось найти выбранные товары", "error")
-        return redirect(url_for("view_cart"))
-
-    total = round(sum(item.book.price * item.quantity for item in cart_items), 2)
+    cart_items = CartItem.query.filter_by(user_id=current_user.id).all()
+    total = sum(item.book.price * item.quantity for item in cart_items)
 
     session['order_info'] = {
-        "name": request.form['name'],
-        "phone": request.form['phone'],
-        "delivery_method": request.form['delivery_method'],
-        "address": request.form.get('address', ''),
-        "pickup_location": request.form.get('pickup_location', ''),
-        "total": total,
-        "selected_ids": selected_ids  # сохраняем для finalize
+        "name": name,
+        "phone": phone,
+        "delivery_method": delivery_method,
+        "address": address,
+        "pickup_location": pickup_location,
+        "total": total
     }
 
     return render_template('confirm_order.html',
-                           name=request.form['name'],
-                           phone=request.form['phone'],
-                           delivery_method=request.form['delivery_method'],
-                           address=request.form.get('address', ''),
-                           pickup_location=request.form.get('pickup_location', ''),
+                           name=name,
+                           phone=phone,
+                           delivery_method=delivery_method,
+                           address=address,
+                           pickup_location=pickup_location,
                            total=total,
-                           delivery_date=datetime.utcnow().date().strftime("%d.%m.%Y"))
-
+                           delivery_date=delivery_date)
 
 
 @app.route('/finalize_order', methods=['POST'])
 @login_required
 def finalize_order():
     order_info = session.pop("order_info", None)
-    selected_ids = order_info.get("selected_ids") if order_info else []
-
-    if not order_info or not selected_ids:
+    if not order_info:
         flash("Ошибка оформления заказа", "error")
         return redirect(url_for("view_cart"))
 
-    cart_items = CartItem.query.filter(
-        CartItem.id.in_(selected_ids),
-        CartItem.user_id == current_user.id
-    ).all()
-
+    cart_items = CartItem.query.filter_by(user_id=current_user.id).all()
     if not cart_items:
-        flash("Корзина пуста или выбранные товары не найдены", "error")
+        flash("Корзина пуста", "error")
         return redirect(url_for("view_cart"))
 
     order = Order(
         user_id=current_user.id,
-        total_price=round(order_info['total'], 2)
+        total_price=order_info['total']
     )
     db.session.add(order)
     db.session.flush()
@@ -355,18 +327,10 @@ def finalize_order():
         db.session.delete(item)
 
     db.session.commit()
-    session.pop('selected_ids', None)  # очищаем
     flash("Заказ успешно оформлен!", "success")
     return redirect(url_for("orders"))
 
 
-@app.template_filter('delivery_label')
-def delivery_label(method):
-    return {
-        'courier': 'Доставка курьером',
-        'postman': 'Почта',
-        'store': 'Самовывоз'
-    }.get(method, 'Неизвестно')
 
 
 @app.route('/delivery')

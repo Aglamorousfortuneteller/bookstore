@@ -6,14 +6,11 @@
 {% if cart_items %}
 <form method="post" action="{{ url_for('checkout') }}">
     <label>
-    <input type="checkbox" id="select-all" onclick="
-        const checkboxes = document.querySelectorAll('.item-checkbox');
-        checkboxes.forEach(cb => cb.checked = this.checked);
-        updateSelectedCount();
-    "> Выбрать все
+        <input type="checkbox" id="select-all" onclick="
+            var checkboxes = document.querySelectorAll('.item-checkbox');
+            for (var i = 0; i < checkboxes.length; i++) checkboxes[i].checked = this.checked;
+        "> Выбрать все
     </label>
-    <span id="selected-count" style="margin-left: 10px;">0 выбрано</span>
-
 
     <ul style="list-style: none; padding-left: 0;">
         {% for item in cart_items %}
@@ -26,7 +23,10 @@
                 Год: {{ item.book.year }}<br>
                 Цена: {{ item.book.price }} ₽
             </div>
-
+            <!-- отдельная форма вне основной формы -->
+            <form method="post" action="{{ url_for('update_cart_item', item_id=item.id) }}">
+                <input type="number" name="quantity" value="{{ item.quantity }}" min="1" style="width: 60px;" onchange="this.form.submit();">
+            </form>
         </li>
         {% endfor %}
     </ul>
@@ -48,19 +48,4 @@
 
 <br>
 <a href="{{ url_for('index') }}">← На главную</a>
-
-<script>
-function updateSelectedCount() {
-    const selected = document.querySelectorAll('.item-checkbox:checked').length;
-    document.getElementById('selected-count').textContent = `${selected} выбрано`;
-}
-
-document.addEventListener('DOMContentLoaded', function () {
-    const checkboxes = document.querySelectorAll('.item-checkbox');
-    checkboxes.forEach(cb => cb.addEventListener('change', updateSelectedCount));
-    updateSelectedCount();
-});
-</script>
-
-
 {% endblock %}
