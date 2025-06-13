@@ -3,13 +3,14 @@
 {% block content %}
 <h1>📦 Оформление заказа</h1>
 
-{% if items %}
+{% if cart_items %}
 <ul>
-    {% for item in items %}
+    {% for item in cart_items %}
     <li>{{ item.book.title }} — {{ item.quantity }} шт. × {{ item.book.price }} ₽</li>
     {% endfor %}
 </ul>
 <p><strong>Итого:</strong> {{ "%.2f"|format(total) }} ₽</p>
+
 
 <form method="post" action="{{ url_for('checkout') }}">
     <p><strong>Кто будет забирать/получать заказ?</strong></p>
@@ -19,7 +20,7 @@
     <div>
         <label>Фамилия Имя получателя:
             <input type="text" name="name"
-                   value="{{ request.form.name or current_user.full_name }}" required>
+                   value="{{ current_user.first_name or '' }} {{ current_user.last_name or '' }}" required>
         </label>
     </div><br>
 
@@ -52,6 +53,33 @@
     <input type="hidden" name="confirm" value="yes">
     <button type="submit" formaction="{{ url_for('confirm_order') }}">Перейти к подтверждению</button>
 </form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const selfRadio = document.querySelector('input[name="recipient_type"][value="self"]');
+    const otherRadio = document.querySelector('input[name="recipient_type"][value="other"]');
+    const nameField = document.querySelector('input[name="name"]');
+    const phoneField = document.querySelector('input[name="phone"]');
+
+    const defaultName = "{{ (current_user.first_name or '') ~ ' ' ~ (current_user.last_name or '') }}";
+    const defaultPhone = "{{ current_user.phone or '' }}";
+
+    function updateFields() {
+        if (selfRadio.checked) {
+            nameField.value = defaultName;
+            phoneField.value = defaultPhone;
+        } else if (otherRadio.checked) {
+            nameField.value = '';
+            phoneField.value = '';
+        }
+    }
+
+    selfRadio.addEventListener('change', updateFields);
+    otherRadio.addEventListener('change', updateFields);
+});
+</script>
+
+
 {% else %}
 <p>Нет товаров для оформления.</p>
 {% endif %}
