@@ -60,12 +60,34 @@
 
 <a href="{{ url_for('index') }}">← На главную</a>
 
+
+<!-- Подтверждение удаления книги -->
+<div id="delete-popup" style="display: none; position: fixed; top: 50%; left: 50%;
+     transform: translate(-50%, -50%); background: white; padding: 20px; border: 1px solid #333; z-index: 1000;">
+    <p>Удалить книгу из корзины?</p>
+    <form id="delete-form" method="post">
+        <button type="submit">Да</button>
+        <button type="button" onclick="closeDeletePopup()">Нет</button>
+    </form>
+</div>
+
+
+
+
 <script>
 
 function changeQuantity(itemId, delta) {
   const qtySpan = document.getElementById('qty-' + itemId);
   let currentQty = parseInt(qtySpan.textContent);
   const newQty = currentQty + delta;
+
+  if (newQty <= 0) {
+    // Показываем окно подтверждения
+    const deleteForm = document.getElementById('delete-form');
+    deleteForm.action = `/cart/remove/${itemId}`;
+    document.getElementById('delete-popup').style.display = 'block';
+    return;
+  }
 
   fetch(`/cart/update/${itemId}`, {
     method: 'POST',
@@ -75,10 +97,8 @@ function changeQuantity(itemId, delta) {
     body: `quantity=${newQty}`
   }).then(response => {
     if (response.redirected) {
-      // Если сервер удалил и сделал redirect — перезагружаем
       window.location.href = response.url;
     } else if (response.ok) {
-      // Обновляем количество и цену
       qtySpan.textContent = newQty;
       fetch('/cart/total')
         .then(res => res.json())
@@ -135,6 +155,11 @@ function submitCheckoutForm() {
   document.getElementById('selected-items-input').value = selectedIds.join(',');
   document.getElementById('checkout-form').submit();
 }
+
+function closeDeletePopup() {
+  document.getElementById('delete-popup').style.display = 'none';
+}
+
 </script>
 
 

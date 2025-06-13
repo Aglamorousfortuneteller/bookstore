@@ -261,16 +261,6 @@ def update_cart_item(item_id):
         return redirect(url_for('view_cart'))
 
 
-
-@app.route('/cart/total')
-@login_required
-def cart_total():
-    cart_items = CartItem.query.filter_by(user_id=current_user.id).all()
-    total = round(sum(item.book.price * item.quantity for item in cart_items), 2)
-    return jsonify({'total': total})
-
-
-
 @app.route('/remove_selected', methods=['POST'])
 @login_required
 def remove_selected():
@@ -286,6 +276,32 @@ def remove_selected():
         if deleted:
             flash("Выбранные книги удалены", "info")
     return redirect(url_for('view_cart'))
+
+
+
+@app.route('/cart/remove/<int:item_id>', methods=['POST'])
+@login_required
+def remove_cart_item(item_id):
+    item = CartItem.query.get_or_404(item_id)
+    if item.user_id != current_user.id:
+        return "Недоступно", 403
+
+    db.session.delete(item)
+    db.session.commit()
+    flash("Книга удалена из корзины", "info")
+    return redirect(url_for('view_cart'))
+
+
+@app.route('/cart/total')
+@login_required
+def cart_total():
+    cart_items = CartItem.query.filter_by(user_id=current_user.id).all()
+    total = round(sum(item.book.price * item.quantity for item in cart_items), 2)
+    return jsonify({'total': total})
+
+
+
+
 
 
 @app.route('/checkout', methods=['GET', 'POST'])
@@ -304,17 +320,16 @@ def checkout():
                     continue
         db.session.commit()
 
-    selected_ids_raw = request.form.get('selected_items')
-    selected_ids = selected_ids_raw.split(',') if selected_ids_raw else []
+        selected_ids_raw = request.form.get('selected_items')
+        selected_ids = selected_ids_raw.split(',') if selected_ids_raw else []
 
-    if not selected_ids:
-        if request.form.get('flash_error'):
-            flash("Выберите хотя бы один товар для оформления заказа", "error")
-        return redirect(url_for('view_cart'))
+        if not selected_ids:
+            if request.form.get('flash_error'):
+                flash("Выберите хотя бы один товар для оформления заказа", "error")
+            return redirect(url_for('view_cart'))
 
-
-        session['selected_ids'] = selected_ids
-        return redirect(url_for('checkout'))
+        session['selected_ids'] = selected_ids  # ✅ переместили сюда
+        return redirect(url_for('checkout'))     # ✅ сразу после сохранения
 
     # GET-запрос — рендерим страницу оформления
     selected_ids = session.get('selected_ids')
@@ -327,9 +342,8 @@ def checkout():
         cart_items = CartItem.query.filter_by(user_id=current_user.id).all()
 
     total = round(sum(item.book.price * item.quantity for item in cart_items), 2)
-    return render_template('checkout.html', cart_items=cart_items, total=total)
-
-
+    delivery_date = datetime.utcnow().date().strftime("%d.%m.%Y")
+    return render_template('checkout.html', cart_items=cart_items, total=total, delivery_date=delivery_date)
 
 
 
@@ -408,6 +422,31 @@ def finalize_order():
     session.pop('selected_ids', None)  # очищаем
     flash("Заказ успешно оформлен!", "success")
     return redirect(url_for("orders"))
+
+
+
+@app.route('/orders/<int:order_id>')
+@login_required
+def order_details(order_id):
+    order = Order.query.get_or_404(order_id)
+    if order.user_id != current_user.id:
+        abort(403)  # доступ запрещён
+    return render_template('order_details.html', order=order)
+
+@app.route('/orders/<int:order_id>/cancel', methods=['POST'])
+@login_required
+def cancel_order(order_id):
+    order = Order.query.get_or_404(order_id)
+    if order.user_id != current_user.id:
+        abort(403)
+    if order.status == 'Ожидается':
+        order.status = 'Отменён'
+        db.session.commit()
+        flash('Заказ успешно отменён', 'info')
+    else:
+        flash('Нельзя отменить заказ со статусом: ' + order.status, 'error')
+    return redirect(url_for('order_details', order_id=order.id))
+
 
 
 @app.template_filter('delivery_label')
