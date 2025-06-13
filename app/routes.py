@@ -232,8 +232,9 @@ def view_cart():
     cart_items = CartItem.query.filter_by(user_id=current_user.id).all()
     total = sum(item.book.price * item.quantity for item in cart_items)
 
-    if request.args.get('error') == '1':
-        flash('Выберите хотя бы одну книгу для удаления', 'error')
+    if request.args.get('deleted') == '1':
+        flash("Книга удалена из корзины", "info")
+
 
     return render_template('cart.html', cart_items=cart_items, total=total)
 
@@ -249,15 +250,17 @@ def update_cart_item(item_id):
         quantity = int(request.form['quantity'])
         if quantity < 1:
             db.session.delete(item)
-            flash("Книга удалена из корзины", "info")
+            db.session.commit()
+            return redirect(url_for('view_cart', deleted='1'))
         else:
             item.quantity = quantity
-            flash("Количество обновлено", "success")
-        db.session.commit()
+            db.session.commit()
+            return '', 204  # OK, no content
     except Exception:
         flash("Ошибка при обновлении", "error")
+        return redirect(url_for('view_cart'))
 
-    return redirect(url_for('view_cart'))
+
 
 @app.route('/cart/total')
 @login_required
@@ -265,19 +268,6 @@ def cart_total():
     cart_items = CartItem.query.filter_by(user_id=current_user.id).all()
     total = round(sum(item.book.price * item.quantity for item in cart_items), 2)
     return jsonify({'total': total})
-
-
-@app.route('/cart/delete/<int:item_id>', methods=['POST'])
-@login_required
-def delete_from_cart(item_id):
-    item = CartItem.query.get(item_id)
-    if item and item.user_id == current_user.id:
-        db.session.delete(item)
-        db.session.commit()
-        flash("Книга удалена из корзины", "error")  # Используется стиль с красной рамкой
-    return '', 204  # Возвращаем пусто, т.к. fetch() сам обновит страницу
-
-
 
 
 
@@ -314,13 +304,13 @@ def checkout():
                     continue
         db.session.commit()
 
-        selected_ids_raw = request.form.get('selected_items')
-        selected_ids = selected_ids_raw.split(',') if selected_ids_raw else []
+    selected_ids_raw = request.form.get('selected_items')
+    selected_ids = selected_ids_raw.split(',') if selected_ids_raw else []
 
-        if not selected_ids:
-            if request.form.get('flash_error'):
-                flash("Выберите хотя бы один товар для оформления заказа", "error")
-            return redirect(url_for('view_cart'))
+    if not selected_ids:
+        if request.form.get('flash_error'):
+            flash("Выберите хотя бы один товар для оформления заказа", "error")
+        return redirect(url_for('view_cart'))
 
 
         session['selected_ids'] = selected_ids

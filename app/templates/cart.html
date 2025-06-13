@@ -74,25 +74,18 @@ function changeQuantity(itemId, delta) {
     },
     body: `quantity=${newQty}`
   }).then(response => {
-    if (response.ok) {
-        if (newQty < 1) {
-        fetch(`/cart/delete/${itemId}`, {
-            method: 'POST'
-        }).then(() => {
-            window.location.reload();
+    if (response.redirected) {
+      // Если сервер удалил и сделал redirect — перезагружаем
+      window.location.href = response.url;
+    } else if (response.ok) {
+      // Обновляем количество и цену
+      qtySpan.textContent = newQty;
+      fetch('/cart/total')
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('total-price').textContent = data.total + ' ₽';
         });
-        return;
-        }
-        else {
-            qtySpan.textContent = newQty;
-            fetch('/cart/total')
-            .then(res => res.json())
-            .then(data => {
-                document.getElementById('total-price').textContent = data.total + ' ₽';
-            });
-        }
-        } 
-    else {
+    } else {
       showMessage("Ошибка при обновлении", "error");
     }
   }).catch(err => {
@@ -100,6 +93,8 @@ function changeQuantity(itemId, delta) {
     showMessage("Ошибка соединения", "error");
   });
 }
+
+
 
 function updateSelectedCount() {
   const selected = document.querySelectorAll('.item-checkbox:checked').length;
@@ -114,15 +109,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 function proceedToCheckout() {
   const selectedIds = Array.from(document.querySelectorAll('.item-checkbox:checked')).map(cb => cb.value);
-
-  if (selectedIds.length === 0) {
-    showMessage("Ничего не выбрано для оформления", "error");
-    return;
-  }
-
   const formData = new FormData();
   selectedIds.forEach(id => formData.append('selected_items', id));
-
   fetch('{{ url_for("checkout") }}', {
     method: 'POST',
     body: formData
@@ -137,7 +125,6 @@ function proceedToCheckout() {
 
 function submitCheckoutForm() {
   const selectedIds = Array.from(document.querySelectorAll('.item-checkbox:checked')).map(cb => cb.value);
-
   if (selectedIds.length === 0) {
     // обычный flash-сообщение отобразится после redirect, НЕ через JS
     const form = document.getElementById('checkout-form');
@@ -145,19 +132,8 @@ function submitCheckoutForm() {
     form.submit();
     return;
   }
-
   document.getElementById('selected-items-input').value = selectedIds.join(',');
   document.getElementById('checkout-form').submit();
-}
-
-
-
-function showMessage(text, category) {
-  const flash = document.createElement('div');
-  flash.className = 'flash-' + category;
-  flash.textContent = text;
-  document.getElementById('flash-messages').appendChild(flash);
-  setTimeout(() => flash.remove(), 4000);
 }
 </script>
 
