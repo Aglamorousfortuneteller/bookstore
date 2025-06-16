@@ -48,9 +48,7 @@
 {% else %}
     <p>В этой категории пока нет книг.</p>
 {% endif %}
-<a href="{{ url_for('index') }}" style="display: inline-block; margin-top: 20px; text-decoration: none;">← На главную</a>
-    <br>
-    <br>
-    <br>
-    <br> 
+
+<a href="{{ url_for('index') }}" class="floating-back-button"> ← На главную</a>
+
 {% endblock %}

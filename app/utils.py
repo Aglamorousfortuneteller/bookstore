@@ -33,7 +33,7 @@ def load_books_from_json(filepath):
                 exists = Book.query.filter_by(title=b['title'], author=b['author']).first()
                 if not exists:
                     genre = b.get('genre')
-                    category = GENRE_TO_CATEGORY.get(genre, 'Другое')  # ❗ добавляем категорию
+                    category = GENRE_TO_CATEGORY.get(genre, 'Другое')  # добавляю категорию
 
                     book = Book(
                         title=b['title'],
@@ -48,8 +48,8 @@ def load_books_from_json(filepath):
                     )
                     db.session.add(book)
             db.session.commit()
-            print("✅ Книги загружены (без дублей)")
+            print("Книги загружены (без дублей)")
     except Exception as e:
-        print(f"⚠️ Ошибка при загрузке книг: {e}")
+        print(f"Ошибка при загрузке книг: {e}")
 
 

@@ -3,14 +3,13 @@ from .extensions import db, login_manager
 from .models import User
 from .utils import load_books_from_json
 import os
-import sqlite3
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
+import sqlite3
 
 
-# Включение внешних ключей для SQLite
 @event.listens_for(Engine, "connect")
-def enable_sqlite_foreign_keys(dbapi_connection, connection_record):
+def enable_sqlite_fk(dbapi_connection, connection_record):
     if isinstance(dbapi_connection, sqlite3.Connection):
         cursor = dbapi_connection.cursor()
         cursor.execute("PRAGMA foreign_keys=ON")

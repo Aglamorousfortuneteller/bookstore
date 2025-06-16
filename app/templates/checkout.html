@@ -36,16 +36,16 @@
         </label><br><br>
     </div>
 
-        <div id="pickup-block" style="display:none;">
-            <label>Пункт самовывоза:
-                <select name="pickup_location">
-                    <option value="store1">ул. Ленина, 1</option>
-                    <option value="store2">ул. Победы, 12</option>
-                    <option value="store3">пр-т Независимости, 45</option>
-                    <option value="moscow_tverskaya_8">г. Москва, ул. Тверская, д. 8</option>  <!-- 📍 добавлено -->
-                </select>
-            </label><br><br>
-        </div>
+    <div id="pickup-block" style="display:none;">
+        <label>Пункт самовывоза:
+            <select name="pickup_location">
+                <option value="moscow_tverskaya_8">г. Москва, ул. Тверская, д. 8</option>
+                <option value="pushkina_kolotushkina">г. Москва, ул. Пушкина, д. Колотушкина</option>
+                <option value="zazhopinsk_pobedy_1"> г. Зажопинск, пр. Победы, д. 1</option>
+            </select>
+        </label><br><br>
+    </div>
+
 
     <p><strong>Оплата:</strong> при получении</p>
     <p><strong>Сумма заказа:</strong> {{ "%.2f"|format(total) }} ₽</p>
@@ -70,5 +70,6 @@ function toggleDeliveryFields() {
 <p>Нет товаров для оформления.</p>
 {% endif %}
 
-<a href="{{ url_for('view_cart') }}">← Назад в корзину</a>
+<a href="{{ url_for('view_cart') }}" class="floating-back-button">← Назад в корзину</a>
+
 {% endblock %}

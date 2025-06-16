@@ -1,81 +1,63 @@
-<!-- index.html -->
 {% extends 'base.html' %}
 {% block title %}Книжный магазин{% endblock %}
+
 {% block content %}
 
-<div style="display: flex; gap: 10px; align-items: flex-start;">
-            <div>
-                <h2>Каталог</h2>
-                <ul style="list-style: none; padding-left: 0;">
-                    <li><a href="{{ url_for('books_by_category', category_name='Все книги') }}">Все книги</a></li>
-                    <li><a href="{{ url_for('books_by_category', category_name='Художественная литература') }}">Художественная литература</a></li>
-                    <li><a href="{{ url_for('books_by_category', category_name='Нехудожественная литература') }}">Нехудожественная литература</a></li>
-                    <li><a href="{{ url_for('books_by_category', category_name='Детская литература') }}">Детская литература</a></li>
-                    <li><a href="{{ url_for('books_by_category', category_name='Бизнес-литература') }}">Бизнес-литература</a></li>
-                    <li><a href="{{ url_for('books_by_category', category_name='Учебная литература') }}">Учебная литература</a></li>
-                    <li><a href="{{ url_for('books_by_category', category_name='Книги на иностранном языке') }}">Книги на иностранном языке</a></li>
-                    <li><a href="{{ url_for('books_by_category', category_name='Комиксы, манга, артбуки') }}">Комиксы, манга, артбуки</a></li>
-                    <li><a href="{{ url_for('books_by_category', category_name='Другое') }}">Другое</a></li>
-                </ul>
-            </div>
 
-    <div style="display: block; ">
-            <!-- Блок с ТОП-3 книгами -->
-            <div style="text-align: center; margin-bottom: 30px;">
-                <h2>ТОП-3 продаж недели:</h2>
-                <div style="
-                    display: grid;
-                    grid-template-columns: repeat(3, 1fr);
-                    gap: 20px;
-                    justify-content: center;
-                    max-width: 700px;
-                    margin: 0 auto;
-                ">
-                    {% for book in top_books %}
-                        <a href="{{ url_for('book_detail', book_id=book.id) }}"
-                        style="text-decoration: none; color: inherit;">
-                            <div style="border: 1px solid #ccc; padding: 10px; box-sizing: border-box; border-radius: 6px;">
-                                <img src="https://media.istockphoto.com/id/162833278/nl/foto/blank-book.jpg?s=612x612&w=0&k=20&c=C-kb218UqFZ_ZdWg8ILDDcXDwpmYzwghnew_7VWZwm4="
-                                    alt="Обложка"
-                                    style="width: 100%; height: auto; object-fit: cover;">
-                                <div style="margin-top: 10px;">
-                                    <strong style="display: block;">{{ book.title }}</strong>
-                                    <em style="color: #666;">{{ book.author }}</em><br>
-                                    <span style="color: #333;">Рейтинг: {{ book.rating }}</span>
-                                </div>
-                            </div>
-                        </a>
-                    {% endfor %}
+<!-- Основной контент -->
+<div id="main-content" style="padding: 20px;">
+
+    <!-- ТОП-3 -->
+    <div class="top3-wrapper">
+        <h2 class="top3-heading">ТОП-3 продаж недели:</h2>
+        <div class="top3-books">
+            {% for book in top_books %}
+            <a href="{{ url_for('book_detail', book_id=book.id) }}" class="book-card">
+                <div>
+                    <img src="https://media.istockphoto.com/id/162833278/nl/foto/blank-book.jpg?s=612x612&w=0&k=20&c=C-kb218UqFZ_ZdWg8ILDDcXDwpmYzwghnew_7VWZwm4=" alt="Обложка">
+                    <div class="book-info">
+                        <strong>{{ book.title }}</strong>
+                        <em>{{ book.author }}</em>
+                        <span>Рейтинг: {{ book.rating }}</span>
+                    </div>
                 </div>
-            <h2 style="text-align: center;">Жанры</h2>
-                <div style="
-                    display: grid;
-                    grid-template-columns: repeat(5, 1fr);
-                    gap: 10px;
-                    max-width: 1000px;
-                    margin: 0 auto;
-                    text-align: center;">
-                    {% for genre in genres[:10] %}
-                        <a href="{{ url_for('books_by_genre', genre_name=genre) }}"
-                        style="
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
-                            aspect-ratio: 1 / 1;
-                            background: #fff;
-                            border: 1px solid #ccc;
-                            border-radius: 4px;
-                            text-decoration: none;
-                            color: #333;
-                            font-weight: bold;
-                        ">
-                            {{ genre }}
-                        </a>
-                    {% endfor %}
-                </div>
-
-
+            </a>
+            {% endfor %}
         </div>
     </div>
+
+    <!-- Жанры -->
+    <h2 style="text-align: center;">Жанры</h2>
+    <div style="
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+        max-width: 1000px;
+        margin: 0 auto;
+        text-align: center;">
+        {% for genre in genres[:10] %}
+        <a href="{{ url_for('books_by_genre', genre_name=genre) }}"
+           style="
+               display: flex;
+               justify-content: center;
+               align-items: center;
+               aspect-ratio: 1 / 1;
+               background: #fff;
+               border: 1px solid #ccc;
+               border-radius: 4px;
+               text-decoration: none;
+               color: #333;
+               font-weight: bold;">
+            {{ genre }}
+        </a>
+        {% endfor %}
+    </div>
+
 </div>
+
+
+
+
+
+
 {% endblock %}

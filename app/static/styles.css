@@ -1,0 +1,370 @@
+/* Основные стили для книжного магазина */
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #fdfdfd;
+    color: #222;
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+header {
+    background-color: white;
+    border-bottom: 1px solid #ccc;
+    padding: 20px;
+}
+
+
+footer {
+    padding: 20px 0;
+    width: 100%;
+    font-weight: bold;
+    border-top: 1px solid #ccc;
+}
+
+
+footer a {
+    font-weight: bold;
+}
+
+
+.footer-inner {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 20px;
+    text-align: center;
+}
+
+.logo-search {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.logo-search form {
+    flex: 1;
+    min-width: 200px;
+}
+
+.search-profile input[type="text"] {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.profile a {
+    margin-left: 10px;
+}
+
+.container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.main-content {
+    flex: 1;
+    padding: 20px 0;
+}
+
+.book-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 20px;
+}
+
+.book-card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.book-box {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 6px;
+    box-sizing: border-box;
+    height: 100%;
+}
+
+
+.book-image {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.book-info {
+    margin-top: 8px;
+    color: #333;
+}
+
+.top3-wrapper {
+    text-align: center;
+    margin: 0 auto 30px auto;
+    padding: 0 15px;
+    max-width: 1000px;
+}
+
+.top3-heading {
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.top3-books {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.top3-books a > div {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+    width: max-content;
+    min-width: 140px;
+    max-width: 200px;
+    height: 320px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+}
+
+.top3-books a img {
+    width: 100%;
+    height: auto;
+    max-height: 180px;
+    object-fit: cover;
+    display: block;
+}
+
+.book-info {
+    margin-top: 10px;
+    word-break: break-word;
+}
+
+.book-info strong,
+.book-info em,
+.book-info span {
+    display: block;
+    margin: 2px 0;
+}
+
+.flash-success {
+    background: #e6ffed;
+    border: 1px solid #3c763d;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+.flash-error {
+    background: #ffe6e6;
+    border: 1px solid #a94442;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+.flash-info {
+    background: #f1f1f1;
+    border: 1px solid #aaa;
+    padding: 10px;
+    margin: 10px 0;
+    color: #333;
+}
+
+a {
+    color: #333;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+ul li {
+    margin-bottom: 10px;
+}
+
+/* Адаптивность */
+@media (max-width: 800px) {
+    .logo-search {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .logo-search form {
+        width: 100%;
+    }
+
+    .book-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .book-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+.profile-container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.profile-container h1,
+.profile-container h2 {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.profile-info p {
+    font-size: 16px;
+    margin: 8px 0;
+}
+
+
+.profile-info strong {
+    display: inline-block;
+    width: 80px;
+}
+
+
+.password-change-wrapper {
+    display: flex;
+    justify-content: flex-start;
+    padding: 20px 0;
+}
+
+.profile-form {
+    width: 100%;
+    max-width: 35%;
+}
+
+.profile-form .form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+.profile-form label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.profile-form input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.profile-form button {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.profile-form button:hover {
+    background-color: #0056b3;
+}
+
+.delete-form {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.delete-form button {
+    padding: 10px 15px;
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.delete-form button:hover {
+    background-color: darkred;
+}
+
+.back-link {
+    display: block;
+    margin: 0 auto 0;
+    text-align: left;
+    text-decoration: none;
+    color: #333;
+}
+
+
+.orders-link-wrapper {
+    margin-bottom: 20px;
+}
+
+.orders-link-wrapper.left {
+    text-align: left;
+}
+
+.orders-link {
+    display: inline-block;
+    padding: 8px 14px;
+    background-color: #28a745;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.orders-link:hover {
+    background-color: #218838;
+}
+
+
+.floating-back-button {
+    position: fixed;
+    top: 88%;
+    left: 18%;
+    z-index: 999;
+    background-color: #f2f2f2;
+    color: #333;
+    padding: 10px 15px;
+    border-radius: 8px;
+    text-decoration: none;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+}
+
+.floating-back-button:hover {
+    background-color: #ddd;
+}

@@ -224,7 +224,6 @@ def delete_account():
         db.session.delete(user)
         db.session.commit()
         return render_template('account_deleted.html')
-    return render_template('delete_accounts.html')
 
 @app.route('/cart')
 @login_required
@@ -328,8 +327,8 @@ def checkout():
                 flash("Выберите хотя бы один товар для оформления заказа", "error")
             return redirect(url_for('view_cart'))
 
-        session['selected_ids'] = selected_ids  # ✅ переместили сюда
-        return redirect(url_for('checkout'))     # ✅ сразу после сохранения
+        session['selected_ids'] = selected_ids
+        return redirect(url_for('checkout'))
 
     # GET-запрос — рендерим страницу оформления
     selected_ids = session.get('selected_ids')
@@ -469,8 +468,8 @@ def delivery_label(method):
 def pickup_label(code):
     return {
         'moscow_tverskaya_8': 'Москва, ул. Тверская, 8',
-        'spb_nevsky_20': 'Санкт-Петербург, Невский пр., 20',
-        'nsk_lenina_5': 'Новосибирск, ул. Ленина, 5'
+        'pushkina_kolotushkina': 'ул. Пушкина, д. Колотушкина',
+        'zazhopinsk_pobedy_1': 'Зажопинск, пр. Победы, д. 1 (ориентир — танк)'
     }.get(code, 'Неизвестный пункт')
 
 

@@ -25,5 +25,6 @@
     <p>В этом жанре пока нет книг.</p>
 {% endif %}
 
-<p><a href="{{ url_for('index') }}" style="display: inline-block; margin-top: 20px; text-decoration: none;">← Назад на главную</a></p>
+<a href="{{ url_for('index') }}" class="floating-back-button">← Назад на главную</a>
+
 {% endblock %}
