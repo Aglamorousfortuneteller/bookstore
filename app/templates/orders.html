@@ -2,33 +2,40 @@
 {% extends 'base.html' %}
 {% block title %}Мои заказы{% endblock %}
 {% block content %}
-<h1>Мои заказы</h1>
+<h1 class="page-title">📦 Мои заказы</h1>
 
 {% if orders %}
-    <ul style="list-style: none; padding-left: 0;">
-        {% for order in orders %}
-            <li style="margin-bottom: 20px; border: 1px solid #ccc; padding: 10px;">
-                <p><strong>Номер заказа:</strong> {{ order.id }}</p>
-                <p><strong>Дата:</strong> {{ order.date.strftime('%d.%m.%Y') }}</p>
-                <p><strong>Сумма:</strong> {{ "%.2f"|format(order.total_price) }} ₽</p>
-                <p><strong>Статус:</strong> {{ order.status }}</p>
-                <ul>
-                    {% for item in order.items %}
-                        <li>{{ item.book_title }} — {{ item.quantity }} шт.</li>
-                    {% endfor %}
-                </ul>
-                <a href="{{ url_for('order_details', order_id=order.id) }}"
-                style="display: inline-block; margin-top: 10px; text-decoration: underline; color: blue;">
-                Подробнее →
-                </a>
-            </li>
+  <div class="order-cards-container">
+    {% for order in orders %}
+    <div class="card order-card">
+      <div class="order-header">
+        <div><strong>Заказ №{{ order.id }}</strong></div>
+        <div class="order-status">{{ order.status }}</div>
+      </div>
 
+      <div class="order-meta">
+        <div><strong>Дата:</strong> {{ order.date.strftime('%d.%m.%Y') }}</div>
+        <div><strong>Сумма:</strong> {{ "%.2f"|format(order.total_price) }} ₽</div>
+      </div>
+
+      <div class="order-items">
+        {% for item in order.items %}
+        <div class="order-item-line">
+          <span class="item-name">{{ item.book_title }}</span>
+          <span class="item-qty">{{ item.quantity }} шт.</span>
+        </div>
         {% endfor %}
-    </ul>
+      </div>
+
+      <div class="order-link">
+        <a href="{{ url_for('order_details', order_id=order.id) }}">Подробнее →</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
 {% else %}
-    <p>У вас пока нет заказов.</p>
+  <p>У вас пока нет заказов.</p>
 {% endif %}
 
 <a href="{{ url_for('profile') }}" class="floating-back-button">← Назад в профиль</a>
-
 {% endblock %}

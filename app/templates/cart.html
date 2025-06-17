@@ -1,83 +1,103 @@
+<!-- cart.html -->
 {% extends 'base.html' %}
 {% block title %}Корзина{% endblock %}
 {% block content %}
-<h1>🛒 Ваша корзина</h1>
+<h1 class="page-title">Ваша корзина</h1>
 
 {% if cart_items %}
-<div style="display: flex; gap: 30px; align-items: flex-start;">
+<div class="cart-wrapper">
 
   <!-- Левая колонка -->
-  <div style="flex: 2;">
-    <label>
-      <input type="checkbox" id="select-all" onclick="
-        const checkboxes = document.querySelectorAll('.item-checkbox');
-        checkboxes.forEach(cb => cb.checked = this.checked);
-        updateSelectedCount();
-      "> Выбрать все
-    </label>
-    <span id="selected-count" style="margin-left: 10px;">0 выбрано</span>
+  <div class="cart-left">
+    <div class="cart-header">
+      <label>
+        <input type="checkbox" id="select-all" onclick="
+          const checkboxes = document.querySelectorAll('.item-checkbox');
+          checkboxes.forEach(cb => cb.checked = this.checked);
+          updateSelectedCount();
+        "> Выбрать все
+      </label>
+      <span id="selected-count" style="font-size: 14px; color: #555;">0 выбрано</span>
+    </div>
+    <hr>
 
-    <ul style="list-style: none; padding-left: 0;">
+    <ul class="cart-item-list">
       {% for item in cart_items %}
-      <li style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+      <li class="cart-item">
         <input type="checkbox" class="item-checkbox" value="{{ item.id }}">
-        <img src="https://media.istockphoto.com/id/162833278/nl/foto/blank-book.jpg?s=612x612&w=0&k=20&c=C-kb218UqFZ_ZdWg8ILDDcXDwpmYzwghnew_7VWZwm4=" style="width: 60px; border: 1px solid #ccc;">
-        <div style="flex: 1;">
-          <strong>{{ item.book.title }}</strong><br>
-          Автор: {{ item.book.author }}<br>
-          Год: {{ item.book.year }}<br>
-          Цена: {{ item.book.price }} ₽
+
+        <div style="width: 120px; flex-shrink: 0;">
+          <img src="{{ url_for('static', filename='covers/' + (item.book.cover_filename or 'book_cover.jpg')) }}"
+               alt="Обложка">
         </div>
-        <div>
-          Количество:
-          <a href="#" onclick="event.preventDefault(); changeQuantity({{ item.id }}, -1)">−</a>
-          <span id="qty-{{ item.id }}">{{ item.quantity }}</span>
-          <a href="#" onclick="event.preventDefault(); changeQuantity({{ item.id }}, 1)">+</a>
+
+        <div class="cart-book-info">
+          <div>
+            <div class="cart-book-title">{{ item.book.title }}</div>
+            <div>Автор: {{ item.book.author }}</div>
+            <div>Год: {{ item.book.year }}</div>
+          </div>
+
+          <div class="cart-book-price-info">
+            <div style="margin-bottom: 5px;">
+              Количество:
+              <a href="#" onclick="event.preventDefault(); changeQuantity({{ item.id }}, -1)">−</a>
+              <span id="qty-{{ item.id }}">{{ item.quantity }}</span>
+              <a href="#" onclick="event.preventDefault(); changeQuantity({{ item.id }}, 1)">+</a>
+            </div>
+
+            <div id="item-price-{{ item.id }}" data-price="{{ item.book.price }}">
+              Цена за штуку: {{ item.book.price }} ₽
+            </div>
+
+            <div style="font-weight: bold;">
+              Общая сумма:
+              <span id="item-total-{{ item.id }}">
+                {{ '%.2f' | format(item.book.price * item.quantity) }}
+              </span> ₽
+            </div>
+          </div>
         </div>
       </li>
       {% endfor %}
     </ul>
-
   </div>
 
   <!-- Правая колонка -->
-  <div style="flex: 1; border-left: 1px solid #ccc; padding-left: 20px;">
-    <p><strong>Итого:</strong> <span id="total-price">{{ "%.2f"|format(total) }} ₽</span></p>
-    <form id="checkout-form" method="POST" action="{{ url_for('checkout') }}">
-    <input type="hidden" name="selected_items" id="selected-items-input">
-    <a href="#" onclick="submitCheckoutForm()" style="color: blue; text-decoration: underline; margin-top: 20px;">
-        Перейти к оформлению
-    </a>
-    </form>
+  <div class="cart-summary">
+    <div class="cart-summary-header">
+      <span>Итого:</span>
+      <span id="total-price">{{ "%.2f"|format(total) }} ₽</span>
+    </div>
 
+    <form id="checkout-form" method="POST" action="{{ url_for('checkout') }}" onsubmit="return submitCheckoutForm();">
+      <input type="hidden" name="selected_items" id="selected-items-input">
+      <button type="submit" class="cart-submit-button">Перейти к оформлению</button>
+    </form>
   </div>
 </div>
-
-
 {% else %}
 <p>Ваша корзина пуста.</p>
 {% endif %}
 
 <a href="{{ url_for('index') }}" class="floating-back-button">← Назад на главную</a>
 
-
-<!-- Подтверждение удаления книги -->
-<div id="delete-popup" style="display: none; position: fixed; top: 50%; left: 50%;
-     transform: translate(-50%, -50%); background: white; padding: 20px; border: 1px solid #333; z-index: 1000;">
-    <p style="font-weight: bold; margin-bottom: 15px;">Удалить книгу из корзины?</p>
-    <form id="delete-form" method="post">
-        <div style="display: flex; justify-content: center; gap: 10px;">
-            <button type="submit" style="padding: 8px 15px; font-weight: bold;">Да</button>
-            <button type="button" onclick="closeDeletePopup()" style="padding: 8px 12px; font-weight: bold;">Нет</button>
-        </div>
-    </form>
+<!-- Popup удаления -->
+<div id="delete-popup" class="delete-popup">
+  <p>Удалить книгу из корзины?</p>
+  <form id="delete-form" method="post">
+    <div class="popup-buttons">
+      <button type="submit">Да</button>
+      <button type="button" onclick="closeDeletePopup()">Нет</button>
+    </div>
+  </form>
 </div>
 
-
 <script>
-
 function changeQuantity(itemId, delta) {
   const qtySpan = document.getElementById('qty-' + itemId);
+  const totalSpan = document.getElementById('item-total-' + itemId);
+  const pricePerItem = parseFloat(document.getElementById('item-price-' + itemId).dataset.price);
   let currentQty = parseInt(qtySpan.textContent);
   const newQty = currentQty + delta;
 
@@ -99,6 +119,8 @@ function changeQuantity(itemId, delta) {
       window.location.href = response.url;
     } else if (response.ok) {
       qtySpan.textContent = newQty;
+      totalSpan.textContent = (pricePerItem * newQty).toFixed(2) + ' ₽';
+
       fetch('/cart/total')
         .then(res => res.json())
         .then(data => {
@@ -113,52 +135,39 @@ function changeQuantity(itemId, delta) {
   });
 }
 
-
-
 function updateSelectedCount() {
   const selected = document.querySelectorAll('.item-checkbox:checked').length;
   document.getElementById('selected-count').textContent = `${selected} выбрано`;
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-  const checkboxes = document.querySelectorAll('.item-checkbox');
-  checkboxes.forEach(cb => cb.addEventListener('change', updateSelectedCount));
-  updateSelectedCount();
-});
-
-function proceedToCheckout() {
-  const selectedIds = Array.from(document.querySelectorAll('.item-checkbox:checked')).map(cb => cb.value);
-  const formData = new FormData();
-  selectedIds.forEach(id => formData.append('selected_items', id));
-  fetch('{{ url_for("checkout") }}', {
-    method: 'POST',
-    body: formData
-  }).then(response => {
-    if (response.redirected) {
-      window.location.href = response.url;
-    } else {
-      showMessage("Не удалось перейти к оформлению", "error");
-    }
-  });
-}
-
 function submitCheckoutForm() {
   const selectedIds = Array.from(document.querySelectorAll('.item-checkbox:checked')).map(cb => cb.value);
+  const form = document.getElementById('checkout-form');
+
+  const errorBox = document.getElementById('form-error');
+  if (errorBox) errorBox.remove();
+
   if (selectedIds.length === 0) {
-    const form = document.getElementById('checkout-form');
-    form.innerHTML += '<input type="hidden" name="flash_error" value="1">';
-    form.submit();
-    return;
+    const error = document.createElement('div');
+    error.id = 'form-error';
+    error.textContent = 'Пожалуйста, выберите хотя бы один товар.';
+    error.style.cssText = 'color: red; font-weight: bold; margin-top: 10px;';
+    form.parentNode.insertBefore(error, form);
+    return false;
   }
+
   document.getElementById('selected-items-input').value = selectedIds.join(',');
-  document.getElementById('checkout-form').submit();
+  return true;
 }
 
 function closeDeletePopup() {
   document.getElementById('delete-popup').style.display = 'none';
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+  const checkboxes = document.querySelectorAll('.item-checkbox');
+  checkboxes.forEach(cb => cb.addEventListener('change', updateSelectedCount));
+  updateSelectedCount();
+});
 </script>
-
-
 {% endblock %}

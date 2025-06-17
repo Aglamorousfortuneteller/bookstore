@@ -1,30 +1,31 @@
 <!-- search_result.html -->
 {% extends 'base.html' %}
 {% block title %}Результаты поиска{% endblock %}
+
 {% block content %}
+<div class="main-content">
+    <div class="top3-wrapper">
+        <h2 class="top3-heading">Результаты поиска по запросу: “{{ query }}”</h2>
+    </div>
 
-<h2 style="margin-bottom: 20px;">Результаты поиска по запросу: “{{ query }}”</h2>
-
-{% if books %}
+    {% if books %}
     <div class="book-grid">
         {% for book in books %}
-            <a href="{{ url_for('book_detail', book_id=book.id, prev=request.full_path) }}"
-               class="book-card">
-                <div>
-                    <img src="https://media.istockphoto.com/id/162833278/nl/foto/blank-book.jpg?s=612x612&w=0&k=20&c=C-kb218UqFZ_ZdWg8ILDDcXDwpmYzwghnew_7VWZwm4="
-                         alt="Обложка" class="book-image">
-                    <div class="book-info">
-                        <strong>{{ book.title }}</strong><br>
-                        <span>{{ book.author }}</span>
-                    </div>
+        <a href="{{ url_for('book_detail', book_id=book.id, prev=request.full_path) }}" class="book-card">
+            <div class="book-box">
+                <img src="{{ url_for('static', filename='covers/book_cover.jpg') }}" alt="Обложка" class="book-image">
+                <div class="book-info">
+                    <strong>{{ book.title }}</strong>
+                    <span>{{ book.author }}</span>
                 </div>
-            </a>
+            </div>
+        </a>
         {% endfor %}
     </div>
-{% else %}
-    <p>Ничего не найдено.</p>
-{% endif %}
+    {% else %}
+    <p style="text-align: center; font-size: 18px; margin-top: 40px;">Ничего не найдено.</p>
+    {% endif %}
+</div>
 
 <a href="{{ url_for('index') }}" class="floating-back-button">← Назад на главную</a>
-
 {% endblock %}

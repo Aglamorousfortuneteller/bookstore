@@ -1,13 +1,9 @@
 <!-- account_deleted.html -->
 {% extends 'base.html' %}
 {% block title %}Аккаунт удалён{% endblock %}
-
 {% block content %}
-    <br>
-    <h2>Ваш аккаунт был успешно удалён.</h2>
-    <br>
-    <br>
-    
-<a href="{{ url_for('index') }}" class="floating-back-button"> ← На главную</a>
-
+<div style="text-align: center; margin-top: 80px;">
+  <h2 style="margin-bottom: 20px;">Ваш аккаунт был успешно удалён</h2>
+  <a href="{{ url_for('index') }}" class="floating-back-button">← На главную</a>
+</div>
 {% endblock %}

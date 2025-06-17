@@ -1,19 +1,21 @@
+<!-- confirm_order.html -->
 {% extends 'base.html' %}
 {% block title %}Подтверждение заказа{% endblock %}
 {% block content %}
-<h1>✅ Подтверждение заказа</h1>
+<h1 class="page-title">Подтверждение заказа</h1>
 
-<p>ФИО: {{ name }}</p>
-<p>Телефон: {{ phone }}</p>
-<p>Способ доставки: {{ delivery_method|delivery_label }}</p>
-<p>Сумма заказа: {{ "%.2f"|format(total) }} ₽</p>
-<p>Дата доставки: {{ delivery_date }}</p>
-<p><strong>Оплата при получении</strong></p>
+<p><strong>ФИО:</strong> {{ name }}</p>
+<p><strong>Телефон:</strong> {{ phone }}</p>
+<p><strong>Способ доставки:</strong> {{ delivery_method|delivery_label }}</p>
+<p><strong>Сумма заказа:</strong> {{ "%.2f"|format(total) }} ₽</p>
+<p><strong>Дата доставки:</strong> {{ delivery_date }}</p>
+<p><strong>Оплата:</strong> при получении</p>
 
-<form method="post" action="{{ url_for('finalize_order') }}">
-    <button type="submit">Подтвердить и оформить заказ</button>
+<form method="post" action="{{ url_for('finalize_order') }}" style="text-align: center; margin-top: 20px;">
+  <button type="submit" class="cart-submit-button" style="width: auto; padding: 10px 20px;">
+    Всё верно!
+  </button>
 </form>
 
 <a href="{{ back_url }}" class="floating-back-button">← Назад</a>
-
 {% endblock %}

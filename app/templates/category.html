@@ -1,54 +1,53 @@
 <!-- category.html -->
 {% extends 'base.html' %}
 {% block title %}{{ category }}{% endblock %}
+
 {% block content %}
+<div class="main-content">
+    <div class="top3-wrapper">
+        <h2 class="top3-heading">Категория: {{ category }}</h2>
 
-<h2 style="margin-bottom: 10px;">Категория: {{ category }}</h2>
-{% if genres_in_category %}
-    <p style="margin-bottom: 10px;"><strong>Фильтр по жанрам:</strong></p>
-    <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
-        {% for genre in genres_in_category %}
-            {% set bg = '#ccc' if genre == selected_genre else '#eee' %}
-            <a href="{{ url_for('books_by_category', category_name=category, genre=genre) }}"
-               style="padding: 5px 10px; border-radius: 4px; text-decoration: none; color: black;">
-                {{ genre }}
-            </a>
-        {% endfor %}
-        {% set all_bg = '#ccc' if not selected_genre else '#eee' %}
-        <a href="{{ url_for('books_by_category', category_name=category) }}"
-           style="padding: 5px 10px; border-radius: 4px; text-decoration: none; color: black;">
-            Все жанры
-        </a>
+        {% if genres_in_category %}
+            <p><strong>Фильтр по жанрам:</strong></p>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 20px;">
+                {% for genre in genres_in_category %}
+                    {% set bg = '#ccc' if genre == selected_genre else '#eee' %}
+                    <a href="{{ url_for('books_by_category', category_name=category, genre=genre) }}"
+                       style="padding: 5px 12px; border-radius: 4px; background-color: {{ bg }}; text-decoration: none; color: black;">
+                        {{ genre }}
+                    </a>
+                {% endfor %}
+                {% set all_bg = '#ccc' if not selected_genre else '#eee' %}
+                <a href="{{ url_for('books_by_category', category_name=category) }}"
+                   style="padding: 5px 12px; border-radius: 4px; background-color: {{ all_bg }}; text-decoration: none; color: black;">
+                    Все жанры
+                </a>
+            </div>
+        {% endif %}
+
+        {% if selected_genre %}
+            <h3 style="margin-bottom: 20px;">Жанр: {{ selected_genre }}</h3>
+        {% endif %}
     </div>
-{% endif %}
 
-<h3>{% if selected_genre %}Жанр: {{ selected_genre }}{% endif %}</h3>
-
-{% if books %}
-    <div class="book-grid">
-        {% for book in books %}
-            <a href="{{ url_for('book_detail', book_id=book.id, prev=request.full_path) }}"
-               class="book-card">
-                <div>
-                    <img src="https://media.istockphoto.com/id/162833278/nl/foto/blank-book.jpg?s=612x612&w=0&k=20&c=C-kb218UqFZ_ZdWg8ILDDcXDwpmYzwghnew_7VWZwm4="
-                         alt="Обложка" class="book-image">
-                    <div class="book-info">
-                        <strong>{{ book.title }}</strong><br>
-                        <span>{{ book.author }}</span>
+    {% if books %}
+        <div class="book-grid">
+            {% for book in books %}
+                <a href="{{ url_for('book_detail', book_id=book.id, prev=request.full_path) }}" class="book-card">
+                    <div class="book-box">
+                        <img src="https://media.istockphoto.com/id/162833278/nl/foto/blank-book.jpg?s=612x612&w=0&k=20&c=C-kb218UqFZ_ZdWg8ILDDcXDwpmYzwghnew_7VWZwm4=" alt="Обложка" class="book-image">
+                        <div class="book-info">
+                            <strong>{{ book.title }}</strong>
+                            <span>{{ book.author }}</span>
+                        </div>
                     </div>
-                </div>
-            </a>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p style="text-align: center; font-size: 18px; margin-top: 40px;">В этой категории пока нет книг.</p>
+    {% endif %}
+</div>
 
-
-        {% endfor %}
-
-    </div>
-
-
-{% else %}
-    <p>В этой категории пока нет книг.</p>
-{% endif %}
-
-<a href="{{ url_for('index') }}" class="floating-back-button"> ← На главную</a>
-
+<a href="{{ url_for('index') }}" class="floating-back-button">← На главную</a>
 {% endblock %}

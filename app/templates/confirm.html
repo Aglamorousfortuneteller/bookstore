@@ -1,18 +1,21 @@
-<!-- confirm.html -->>
+<!-- confirm.html -->
 {% extends 'base.html' %}
 {% block title %}Подтверждение регистрации{% endblock %}
+
 {% block content %}
-    <h1>Подтверждение регистрации</h1>
+<div class="profile-container">
+  <div class="card" style="max-width: 400px; margin: 40px auto;">
+    <h2 style="text-align: center; margin-bottom: 20px;">Подтверждение регистрации</h2>
 
     <form method="post">
-        <label>Введите код из СМС:<br>
-            <input type="text" name="code" required>
-        </label><br><br>
-
-        <button type="submit">Подтвердить</button>
+      <div class="form-group">
+        <label for="code">Введите код из СМС</label>
+        <input type="text" id="code" name="code" required>
+      </div>
+      <button type="submit">Подтвердить</button>
     </form>
-
+  </div>
+</div>
 
 <a href="{{ url_for('register') }}" class="floating-back-button">← Назад к регистрации</a>
-
 {% endblock %}

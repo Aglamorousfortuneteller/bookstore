@@ -1,54 +1,89 @@
+<!-- order_details.html -->
 {% extends 'base.html' %}
 {% block title %}Детали заказа{% endblock %}
 {% block content %}
-<h1>Детали заказа</h1>
+<h1 class="page-title">Детали заказа</h1>
 
-<p><strong>Номер заказа:</strong> {{ order.id }}</p>
-<p><strong>Статус:</strong> {{ order.status }}</p>
-<p><strong>ФИО:</strong> {{ order.name }}</p>
-<p><strong>Телефон:</strong> {{ order.phone }}</p>
-<p><strong>Способ доставки:</strong> {{ order.delivery_method|delivery_label }}</p>
-{% if order.delivery_method in ['courier', 'postman'] %}
-<p><strong>Адрес доставки:</strong> {{ order.address }}</p>
-{% elif order.delivery_method == 'store' %}
-<p><strong>Пункт самовывоза:</strong> {{ order.pickup_location|pickup_label }}</p>
+<div class="card" style="margin-bottom: 30px;">
+  <div class="order-info-grid">
+    <div><strong>Номер заказа:</strong></div>
+    <div>{{ order.id }}</div>
 
-{% endif %}
-<p><strong>Дата оформления:</strong> {{ order.date.strftime('%d.%m.%Y') }}</p>
-<p><strong>Оплата:</strong> при получении</p>
+    <div><strong>Статус:</strong></div>
+    <div>{{ order.status }}</div>
 
-<h3>Состав заказа</h3>
-<ul>
+    <div><strong>ФИО:</strong></div>
+    <div>{{ order.name }}</div>
+
+    <div><strong>Телефон:</strong></div>
+    <div>{{ order.phone }}</div>
+
+    <div><strong>Способ доставки:</strong></div>
+    <div>{{ order.delivery_method | delivery_label }}</div>
+
+    {% if order.delivery_method in ['courier', 'postman'] %}
+    <div><strong>Адрес доставки:</strong></div>
+    <div>{{ order.address }}</div>
+    {% elif order.delivery_method == 'store' %}
+    <div><strong>Пункт самовывоза:</strong></div>
+    <div>{{ order.pickup_location | pickup_label }}</div>
+    {% endif %}
+
+    <div><strong>Дата оформления:</strong></div>
+    <div>{{ order.date.strftime('%d.%m.%Y') }}</div>
+
+    <div><strong>Оплата:</strong></div>
+    <div>При получении</div>
+  </div>
+</div>
+
+<div class="order-summary-box card">
+  <h2 style="margin-top: 0;">Состав заказа</h2>
+
+  <div class="order-list">
     {% for item in order.items %}
-        <li>{{ item.book_title }} — {{ item.quantity }} шт. × {{ item.price }} ₽</li>
+    <div class="order-item">
+      <span class="item-title">{{ item.book_title }}</span>
+      <span class="item-price">{{ item.quantity }} × {{ item.price }} ₽</span>
+    </div>
     {% endfor %}
-</ul>
+  </div>
 
-<p><strong>Итого:</strong> {{ "%.2f"|format(order.total_price) }} ₽</p>
+  <div class="order-total">
+    <span>Итого:</span>
+    <span>{{ "%.2f"|format(order.total_price) }} ₽</span>
+  </div>
+</div>
 
 {% if order.status == 'Ожидается' %}
-<button onclick="showCancelConfirmation()">Отменить заказ</button>
+<div style="margin-top: 20px; text-align: center;">
+  <button onclick="showCancelConfirmation()" class="cart-submit-button" style="background-color: #c62828; width: auto; padding: 10px 20px;">
+    Отменить заказ
+  </button>
+</div>
+
+
 {% endif %}
 
 <!-- Подтверждение отмены -->
-<div id="cancel-popup" style="display: none; position: fixed; top: 50%; left: 50%;
-     transform: translate(-50%, -50%); background: white; padding: 20px; border: 1px solid #333; z-index: 1000;">
-    <p>Вы уверены, что хотите отменить заказ?</p>
-    <form method="post" action="{{ url_for('cancel_order', order_id=order.id) }}">
-        <button type="submit">Да</button>
-        <button type="button" onclick="closeCancelPopup()">Нет</button>
-    </form>
+<div id="cancel-popup" class="delete-popup">
+  <p>Вы уверены, что хотите отменить заказ?</p>
+  <form method="post" action="{{ url_for('cancel_order', order_id=order.id) }}">
+    <div class="popup-buttons">
+      <button type="submit">Да</button>
+      <button type="button" onclick="closeCancelPopup()">Нет</button>
+    </div>
+  </form>
 </div>
-
-<script>
-function showCancelConfirmation() {
-    document.getElementById('cancel-popup').style.display = 'block';
-}
-function closeCancelPopup() {
-    document.getElementById('cancel-popup').style.display = 'none';
-}
-</script>
 
 <a href="{{ url_for('orders') }}" class="floating-back-button">← Назад к заказам</a>
 
+<script>
+function showCancelConfirmation() {
+  document.getElementById('cancel-popup').style.display = 'block';
+}
+function closeCancelPopup() {
+  document.getElementById('cancel-popup').style.display = 'none';
+}
+</script>
 {% endblock %}

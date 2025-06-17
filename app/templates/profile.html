@@ -1,58 +1,54 @@
+<!-- profile.html -->
 {% extends 'base.html' %}
 {% block title %}Профиль{% endblock %}
+
 {% block content %}
+<h1 class="page-title" style="text-align: center;">Профиль</h1>
+
+
 <div class="profile-container">
 
-<h1>Профиль пользователя</h1>
+    <div class="card" style="max-width: 500px; margin: 0 auto;">
 
-<div class="profile-info">
-    <p><strong>Имя:</strong> {{ current_user.first_name }} {{ current_user.last_name }}</p>
-    <p><strong>Email:</strong> {{ current_user.email }}</p>
-    <p><strong>Телефон:</strong> {{ current_user.phone }}</p>
-</div>
-<br>
-<hr>
-<br>
-<div class="orders-link-wrapper">
-    <a href="{{ url_for('orders') }}" class="orders-link"> Посмотреть мои заказы</a>
-</div>
-<hr>
-<br>
+        <p><strong>Имя:</strong> {{ current_user.first_name }} {{ current_user.last_name }}</p>
+        <p><strong>Email:</strong> {{ current_user.email }}</p>
+        <p><strong>Телефон:</strong> {{ current_user.phone }}</p>
+        <a href="{{ url_for('orders') }}" class="orders-link">📦 Мои заказы</a>
+    </div>
 
-<h2>Смена пароля</h2>
-<div class="password-change-wrapper">
-    <form method="post" action="{{ url_for('change_password') }}" class="profile-form">
-        <div class="form-group">
-            <label for="current_password">Текущий пароль:</label>
-            <input type="password" id="current_password" name="current_password" required>
+    <div class="card" style="max-width: 500px; margin: 20px auto;">
+        <h2>🔒 Смена пароля</h2>
+        <form method="post" action="{{ url_for('change_password') }}">
+            <div class="form-group">
+                <label for="current_password">Текущий пароль</label>
+                <input type="password" id="current_password" name="current_password" required>
+            </div>
+            <div class="form-group">
+                <label for="new_password">Новый пароль</label>
+                <input type="password" id="new_password" name="new_password" required>
+            </div>
+            <button type="submit">Сменить пароль</button>
+        </form>
+    </div>
+
+    <div class="card" style="max-width: 500px; margin: 20px auto; text-align: center;">
+        <h2 style="color: red; text-align: center;">❌ Удаление аккаунта</h2>
+        <div class="delete-form">
+            <button type="button" onclick="openAccountPopup()">Удалить аккаунт</button>
         </div>
+    </div>
 
-        <div class="form-group">
-            <label for="new_password">Новый пароль:</label>
-            <input type="password" id="new_password" name="new_password" required>
-        </div>
-
-        <button type="submit">Сменить пароль</button>
-    </form>
-</div>
-<hr>
-
-
-
-<h2 style="color: red; text-align: center;">Удаление аккаунта</h2>
-<div class="delete-form">
-    <button type="button" onclick="openAccountPopup()">Удалить аккаунт</button>
-
+    <a href="{{ url_for('index') }}" class="floating-back-button">← На главную</a>
 </div>
 
-<!-- Подтверждение удаления аккаунта -->
-<div id="delete-account-popup" style="display: none; position: fixed; top: 50%; left: 50%;
-     transform: translate(-50%, -50%); background: white; padding: 20px; border: 1px solid #333; z-index: 1000;">
+<!-- Overlay + Popup -->
+<div id="overlay" onclick="closeAccountPopup()"></div>
+<div id="delete-account-popup">
     <p style="font-weight: bold; margin-bottom: 15px;">Удалить аккаунт безвозвратно?</p>
     <form method="post" action="{{ url_for('delete_account') }}">
         <div style="display: flex; justify-content: center; gap: 10px;">
-            <button type="submit" style="padding: 8px 15px; font-weight: bold; background-color: red; color: white;">Да</button>
-            <button type="button" onclick="closeAccountPopup()" style="padding: 8px 12px; font-weight: bold;">Нет</button>
+            <button type="submit" style="background-color: red;">Да</button>
+            <button type="button" onclick="closeAccountPopup()">Нет</button>
         </div>
     </form>
 </div>
@@ -60,16 +56,12 @@
 <script>
     function openAccountPopup() {
         document.getElementById('delete-account-popup').style.display = 'block';
+        document.getElementById('overlay').style.display = 'block';
     }
 
     function closeAccountPopup() {
         document.getElementById('delete-account-popup').style.display = 'none';
+        document.getElementById('overlay').style.display = 'none';
     }
 </script>
-
-<a href="{{ url_for('index') }}" class="floating-back-button"> ← На главную</a>
-
-</div>
-
-
 {% endblock %}
