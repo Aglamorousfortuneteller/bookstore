@@ -8,7 +8,7 @@
 
 ### Функции
 
-- Регистрация и вход с подтверждением по коду
+- Регистрация и вход с подтверждением по коду (код: 1111, имитация подтверждения)
 - Просмотр каталога книг по жанрам и категориям
 - Поиск книг по ключевому слову
 - Подробная информация о книге (описание, цена, год, рейтинг)
@@ -55,7 +55,7 @@ This is a demo online bookstore web app built with Flask. Users can browse the c
 
 ### Features
 
-- Registration and login with code confirmation
+- Registration and login with code confirmation  (1111 as simulation)
 - Book catalog browsing by categories and genres
 - Search books by keyword
 - Book detail page with description, price, year, and rating
