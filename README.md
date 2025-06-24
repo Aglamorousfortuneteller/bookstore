@@ -45,6 +45,64 @@
 
 При первом запуске база данных будет автоматически создана, если она отсутствует.
 
+### Структура проекта
+
+      bookstore/
+      │
+      ├── run.py # Точка входа: запуск приложения
+      ├── import_books_from_json.py # Импорт каталога книг из JSON
+      ├── config.py # Конфигурация Flask-приложения
+      │
+      ├── app/
+      │ ├── init.py # Создание Flask-приложения, инициализация расширений
+      │ ├── models.py # Определения моделей БД
+      │ ├── extensions.py # Расширения Flask (SQLAlchemy, LoginManager и др.)
+      │ ├── register_routes.py # Регистрация всех маршрутов
+      │ ├── utils.py # Вспомогательные функции
+      │ │
+      │ ├── routes/
+      │ │ ├── auth_routes.py # Регистрация, вход, выход
+      │ │ ├── book_routes.py # Главная, поиск, детали книг, жанры, категории
+      │ │ ├── cart_routes.py # Корзина, обновление, удаление, подсчёт стоимости
+      │ │ ├── order_routes.py # Оформление заказа, история, детали
+      │ │ └── static_routes.py # О магазине, контакты и прочие статические страницы
+      │ │
+      │ └── templates/
+      │ ├── account_deleted.html
+      │ ├── base.html
+      │ ├── book_detail.html
+      │ ├── cart.html
+      │ ├── category.html
+      │ ├── checkout.html
+      │ ├── confirm_order.html
+      │ ├── confirm.html
+      │ ├── contacts.html
+      │ ├── delivery.html
+      │ ├── genre.html
+      │ ├── index.html
+      │ ├── login.html
+      │ ├── orders.html
+      │ ├── order_details.html
+      │ ├── payment.html
+      │ ├── profile.html
+      │ ├── register.html
+      │ └── search_results.html
+      │
+      ├── static/
+      │ ├── covers/
+      │ │ └── book_cover.jpg
+      │ └── styles.css # Основные стили
+      │
+      ├── instance/
+      │ └── bookstore.db # База данных SQLite (создаётся при первом запуске)
+      │
+      ├── data/
+      │ └── books_catalog.json # Исходные данные для импорта книг
+      │
+      ├── requirements.txt # Зависимости проекта
+      └── README.md # Документация проекта
+
+
 ---
 
 ## English Version
@@ -91,3 +149,60 @@ This is a demo online bookstore web app built with Flask. Users can browse the c
    ```
 
 The database will be created automatically on first run if it does not exist.
+
+### Project Structure
+
+      bookstore/
+      │
+      ├── run.py # Entry point: run the app
+      ├── import_books_from_json.py # Book catalog import from JSON
+      ├── config.py # Flask app configuration
+      │
+      ├── app/
+      │ ├── init.py # Create Flask app, initialise extensions
+      │ ├── models.py # DB models: User, Book, CartItem, Order, Review, etc.
+      │ ├── extensions.py # Flask extensions (SQLAlchemy, LoginManager, etc.)
+      │ ├── register_routes.py # Route registration
+      │ ├── utils.py # Utility functions
+      │ │
+      │ ├── routes/
+      │ │ ├── auth_routes.py # Registration, login, logout
+      │ │ ├── book_routes.py # Home, search, book details, genres, categories
+      │ │ ├── cart_routes.py # Cart management and price calculation
+      │ │ ├── order_routes.py # Checkout, order history, details
+      │ │ └── static_routes.py # About, contacts, and other static pages
+      │ │
+      │ └── templates/
+      │ ├── account_deleted.html
+      │ ├── base.html
+      │ ├── book_detail.html
+      │ ├── cart.html
+      │ ├── category.html
+      │ ├── checkout.html
+      │ ├── confirm_order.html
+      │ ├── confirm.html
+      │ ├── contacts.html
+      │ ├── delivery.html
+      │ ├── genre.html
+      │ ├── index.html
+      │ ├── login.html
+      │ ├── orders.html
+      │ ├── order_details.html
+      │ ├── payment.html
+      │ ├── profile.html
+      │ ├── register.html
+      │ └── search_results.html
+      │
+      ├── static/
+      │ ├── covers/
+      │ │ └── book_cover.jpg
+      │ └── styles.css # Main styles
+      │
+      ├── instance/
+      │ └── bookstore.db # SQLite database (created on first run)
+      │
+      ├── data/
+      │ └── books_catalog.json # Source data for book import
+      │
+      ├── requirements.txt # Project dependencies
+      └── README.md # Project documentation
