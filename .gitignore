@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.log
+
+# Virtual environment
+.venv/
+venv/
+
+# Flask/Migrations (если появятся)
+instance/
+.env
+.env.*
+
+# VSCode
+.vscode/
+
+#Windows
+
+Thumbs.db

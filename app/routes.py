@@ -18,7 +18,10 @@ def index():
         books = Book.query.all()
 
     top_books = Book.query.order_by(Book.rating.desc()).limit(3).all()
+
     return render_template('index.html', books=books, top_books=top_books)
+
+
 
 @app.route('/search')
 def search():
@@ -26,12 +29,12 @@ def search():
     if not query:
         flash("Введите поисковый запрос.", "info")
         return redirect(url_for('index'))
-
+    
     books = Book.query.filter(
         Book.title.ilike(f'%{query}%') |
         Book.author.ilike(f'%{query}%') |
         Book.genre.ilike(f'%{query}%')).all()
-
+    
     return render_template('search_results.html', books=books, query=query)
 
 
@@ -166,7 +169,7 @@ def confirm_registration():
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
-
+    
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
@@ -296,6 +299,7 @@ def remove_cart_item(item_id):
 def cart_total():
     cart_items = CartItem.query.filter_by(user_id=current_user.id).all()
     total = round(sum(item.book.price * item.quantity for item in cart_items), 2)
+
     return jsonify({'total': total})
 
 
@@ -436,16 +440,14 @@ def finalize_order():
 @login_required
 def order_details(order_id):
     order = Order.query.get_or_404(order_id)
-    if order.user_id != current_user.id:
-        abort(403)
+    
     return render_template('order_details.html', order=order)
 
 @app.route('/orders/<int:order_id>/cancel', methods=['POST'])
 @login_required
 def cancel_order(order_id):
     order = Order.query.get_or_404(order_id)
-    if order.user_id != current_user.id:
-        abort(403)
+
     if order.status == 'Ожидается':
         order.status = 'Отменён'
         db.session.commit()

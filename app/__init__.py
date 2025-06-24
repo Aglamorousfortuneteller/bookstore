@@ -33,16 +33,17 @@ def create_app():
     with app.app_context():
         from . import routes, models
 
-        # 💣 Удаление старой базы (только для отладки!)
+
         db_path = os.path.join(app.root_path, '..', 'instance', 'app.db')
         if os.path.exists(db_path):
             os.remove(db_path)
 
-        # 🧱 Создание новой базы с новым полем `category`
-        db.create_all()
 
-        # 📚 Загрузка книг из JSON с учетом `category`
+        db.create_all()
+        
         books_path = os.path.join(app.root_path, '..', 'data', 'books_catalog.json')
+
         load_books_from_json(books_path)
 
     return app
+

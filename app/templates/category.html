@@ -35,7 +35,7 @@
             {% for book in books %}
                 <a href="{{ url_for('book_detail', book_id=book.id, prev=request.full_path) }}" class="book-card">
                     <div class="book-box">
-                        <img src="https://media.istockphoto.com/id/162833278/nl/foto/blank-book.jpg?s=612x612&w=0&k=20&c=C-kb218UqFZ_ZdWg8ILDDcXDwpmYzwghnew_7VWZwm4=" alt="Обложка" class="book-image">
+                        <img src="{{ url_for('static', filename='covers/' + (book.cover_filename or 'book_cover.jpg')) }}">
                         <div class="book-info">
                             <strong>{{ book.title }}</strong>
                             <span>{{ book.author }}</span>
