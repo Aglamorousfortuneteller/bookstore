@@ -41,9 +41,9 @@
           <div class="cart-book-price-info">
             <div style="margin-bottom: 5px;">
               Количество:
-              <a href="#" onclick="event.preventDefault(); changeQuantity({{ item.id }}, -1)">−</a>
+              <a href="#" onclick="event.preventDefault(); changeQuantity({{item.id}}, -1)">−</a>
               <span id="qty-{{ item.id }}">{{ item.quantity }}</span>
-              <a href="#" onclick="event.preventDefault(); changeQuantity({{ item.id }}, 1)">+</a>
+              <a href="#" onclick="event.preventDefault(); changeQuantity({{item.id}}, 1)">+</a>
             </div>
 
             <div id="item-price-{{ item.id }}" data-price="{{ item.book.price }}">
@@ -119,12 +119,12 @@ function changeQuantity(itemId, delta) {
       window.location.href = response.url;
     } else if (response.ok) {
       qtySpan.textContent = newQty;
-      totalSpan.textContent = (pricePerItem * newQty).toFixed(2) + ' ₽';
+      totalSpan.textContent = (pricePerItem * newQty).toFixed(2);
 
       fetch('/cart/total')
         .then(res => res.json())
         .then(data => {
-          document.getElementById('total-price').textContent = data.total + ' ₽';
+          document.getElementById('total-price').textContent = data.total;
         });
     } else {
       showMessage("Ошибка при обновлении", "error");

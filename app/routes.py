@@ -106,7 +106,7 @@ def book_detail(book_id):
 
         all_ratings = [r.rating for r in Review.query.filter_by(book_id=book_id).all()]
         avg_review_rating = sum(all_ratings) / len(all_ratings)
-        book.rating = round((book.rating + avg_review_rating) / 2, 2)
+        book.rating = round(avg_review_rating, 2)
         db.session.commit()
 
         flash('Ваш отзыв успешно добавлен!', 'review')
@@ -129,14 +129,17 @@ def register():
             flash('Пользователь с таким номером телефона уже зарегистрирован.', 'error')
             return redirect(url_for('register'))
 
+        hashed_password = generate_password_hash(request.form['password'])
+
         session['pending_user'] = {
             'first_name': request.form['first_name'],
             'last_name': request.form['last_name'],
             'email': email,
             'phone': phone,
-            'password': request.form['password'],
+            'password_hash': hashed_password,
         }
         return redirect(url_for('confirm_registration'))
+    
     return render_template('register.html')
 
 
@@ -151,8 +154,9 @@ def confirm_registration():
                     first_name=data['first_name'],
                     last_name=data['last_name'],
                     email=data['email'],
-                    phone=data['phone'])
-                user.set_password(data['password'])
+                    phone=data['phone'],
+                    password_hash=data['password_hash']
+                )
                 db.session.add(user)
                 db.session.commit()
                 session.pop('pending_user', None)
@@ -165,6 +169,7 @@ def confirm_registration():
     return render_template('confirm.html')
 
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -175,7 +180,8 @@ def login():
         password = request.form['password']
 
         user = User.query.filter_by(email=email).first()
-        if user and check_password_hash(user.password, password):
+
+        if user and user.check_password(password):
             login_user(user)
             flash('Вы вошли в систему.', 'success')
             return redirect(url_for('index'))
@@ -183,6 +189,7 @@ def login():
             flash('Неверный email или пароль.', 'error')
 
     return render_template('login.html')
+
 
 @app.route('/logout')
 @login_required
@@ -209,14 +216,15 @@ def change_password():
     current_password = request.form['current_password']
     new_password = request.form['new_password']
 
-    if not check_password_hash(current_user.password, current_password):
+    if not current_user.check_password(current_password):
         flash('Текущий пароль неверен.', 'error')
         return redirect(url_for('profile'))
 
-    current_user.password = generate_password_hash(new_password)
+    current_user.set_password(new_password)
     db.session.commit()
     flash('Пароль успешно обновлён.', 'success')
     return redirect(url_for('profile'))
+
 
 @app.route('/delete-account', methods=['GET', 'POST'])
 @login_required
@@ -334,7 +342,7 @@ def checkout():
         session['selected_ids'] = selected_ids
         return redirect(url_for('checkout'))
 
-    # GET-запрос — рендерим страницу оформления
+
     selected_ids = session.get('selected_ids')
     if selected_ids:
         cart_items = CartItem.query.filter(
@@ -372,7 +380,7 @@ def confirm_order():
         "address": request.form.get('address', ''),
         "pickup_location": request.form.get('pickup_location', ''),
         "total": total,
-        "selected_ids": selected_ids  # сохраняем для finalize
+        "selected_ids": selected_ids
     }
 
     return render_template('confirm_order.html',
